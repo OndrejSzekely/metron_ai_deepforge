@@ -1,0 +1,95 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+default_language_version:
+    python: python3.7
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.2.0
+    hooks:
+    -   id: trailing-whitespace
+        types:
+            - python
+        exclude: docs
+    -   id: end-of-file-fixer
+        types:
+          - python
+        exclude: docs
+    -   id: check-yaml
+        exclude: docs
+    -   id: check-added-large-files
+        args: ['--maxkb=2000']
+        exclude: docs
+
+-   repo: https://github.com/psf/black
+    rev: 22.3.0
+    hooks:
+    -   id: black
+        types:
+            - python
+        args: [--line-length=120]
+        exclude: docs
+-   repo: https://gitlab.com/PyCQA/flake8
+    rev: 3.9.2
+    hooks:
+    -   id: flake8
+        types:
+            - python
+        args: ['--max-line-length=120', '--extend-ignore=E203']
+        exclude: docs
+-   repo: https://github.com/PyCQA/pylint
+    rev: v2.13.7
+    hooks:
+    -   id: pylint
+        types:
+            - python
+        args: ['--disable=C0330, C0326, E0401, duplicate-code', '--max-line-length=120']
+        exclude: docs
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: 'v0.950'
+    hooks:
+    -   id: mypy
+        types:
+            - python
+        args: ['--show-error-codes', '--disallow-untyped-calls', '--disallow-untyped-defs',
+               '--disallow-incomplete-defs', '--disallow-untyped-decorators', '--no-implicit-optional', '--warn-redundant-casts',
+               '--ignore-missing-imports']
+        exclude: docs
+-   repo: https://github.com/PyCQA/bandit
+    rev: 1.7.4
+    hooks:
+    -   id: bandit
+        types:
+            - python
+        args: ['-t=B101,B102,B103,B104,B105,B106,B107,B108,B110,B112,B201,B301,B302,B303,B304,B305,B306,B307,B308,B309,B310,B311,B312,B313,B314,B315,B316,B317,B318,B319,B320,B321,B323,B324,B325,B401,B402,B403,B404,B405,B406,B407,B408,B409,B410,B411,B412,B413,B501,B502,B503,B504,B505,B506,B507,B601,B602,B603,B604,B605,B606,B607,B608,B609,B610,B611,B701,B702,B703']
+        exclude: docs
+- repo: https://github.com/Lucas-C/pre-commit-hooks
+  rev: v1.4.2
+  hooks:
+    - id: forbid-crlf
+      exclude: docs
+    - id: remove-crlf
+      exclude: docs
+    - id: forbid-tabs
+      exclude: docs
+    - id: remove-tabs
+      args: [--whitespaces-count, '2']  # defaults to: 4
+      exclude: docs
+    - id: insert-license
+      files: \.py$
+      args:
+        - --license-filepath
+        - LICENSE_SRC
+        - --use-current-year
+      exclude: docs
+-   repo: local
+    hooks:
+    -   id: sphinx-apidocs
+        name: create API docs
+        language: system
+        entry: bash -c 'sphinx-apidoc -o docs_src/api -f -t docs_src/_template  --private --module-first -d 1 --no-toc -e  . || true'
+-   repo: local
+    hooks:
+    -   id: sphinx
+        name: build sphinx docs
+        language: system
+        entry: bash -c 'sphinx-build -b html docs_src docs || true'
