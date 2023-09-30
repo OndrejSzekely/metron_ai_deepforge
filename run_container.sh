@@ -10,4 +10,4 @@ while [ "$1" != "" ]; do
 
 done
 
-docker run --rm -it --gpus all --env-file .env ${mounted_volumes} -v $(pwd):/metron_ai_deepforge_repo --name metron_ai_deepforge metron_ai/deepforge:latest
+docker run --rm -it --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 --env-file .env ${mounted_volumes} -v $(pwd):/metron_ai_deepforge_repo --name metron_ai_deepforge metron_ai/deepforge:latest
