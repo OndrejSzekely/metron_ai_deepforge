@@ -15,11 +15,12 @@ from metrics.f1_score.f1_score import F1ScoreMetric
 
 DATASET_PATH: Final[str] = "/dq_floral_dataset"
 NUM_OF_CROSS_VAL_SPLITS: Final[int] = 7
-TRAINING_BATCH_SIZE: Final[int] = 2
+TRAINING_BATCH_SIZE: Final[int] = 64
 SKIP_K_FOLD: Final[bool] = False
 OUTPUT_FOLDER: Final[str] = "/outputs"
 EPOCHS_FULL_TRAINING: Final[int] = 30
 EPOCHS_KFOLD_TRAINING: Final[int] = 30
+LR: Final[float] = 1e-4
 
 
 def build_network() -> Any:
@@ -95,7 +96,7 @@ def main():
             logging.info(model.summary())
 
             # define optimizer
-            optimizer = tf.keras.optimizers.SGD(lr=0.001)
+            optimizer = tf.keras.optimizers.Adam(lr=LR)
 
             # compile model
             model.compile(
@@ -138,7 +139,7 @@ def main():
     logging.info(model.summary())
 
     # define optimizer
-    optimizer = tf.keras.optimizers.SGD(lr=0.001)
+    optimizer = tf.keras.optimizers.Adam(lr=LR)
 
     # compile model
     model.compile(
