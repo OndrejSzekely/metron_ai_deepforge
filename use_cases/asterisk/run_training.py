@@ -10,11 +10,13 @@ from keras.models import Model
 from data_loaders.dq_floral_dataset.dataset_collector import DQFloralDatasetCollector
 from data_loaders.dq_floral_dataset.dataset_loader import DQFloralDatasetLoader
 import utils.logging_functions as log_funcs
+from metrics.balanced_accuracy.balanced_accuracy import BalancedAccuracyMetric
+from metrics.f1_score.f1_score import F1ScoreMetric
 
 DATASET_PATH: Final[str] = "/dq_floral_dataset"
 NUM_OF_CROSS_VAL_SPLITS: Final[int] = 7
 TRAINING_BATCH_SIZE: Final[int] = 2
-SKIP_K_FOLD: Final[bool] = True
+SKIP_K_FOLD: Final[bool] = False
 OUTPUT_FOLDER: Final[str] = "/outputs"
 EPOCHS_FULL_TRAINING: Final[int] = 30
 EPOCHS_KFOLD_TRAINING: Final[int] = 30
@@ -103,6 +105,11 @@ def main():
                     "output_open": "binary_crossentropy",
                     "output_insect": "binary_crossentropy",
                 },
+                metrics={
+                    "output_species": BalancedAccuracyMetric(6),
+                    "output_open": F1ScoreMetric(),
+                    "output_insect": F1ScoreMetric(),
+                },
             )
 
             # train the model
@@ -111,6 +118,7 @@ def main():
                 epochs=EPOCHS_KFOLD_TRAINING,
                 steps_per_epoch=train_dataset_loader.number_of_steps,
                 validation_data=val_data,
+                validation_steps=train_dataset_loader.number_of_steps,
             )
 
     # RUN FULL TRAINING
@@ -139,6 +147,11 @@ def main():
             "output_species": "binary_crossentropy",
             "output_open": "binary_crossentropy",
             "output_insect": "binary_crossentropy",
+        },
+        metrics={
+            "output_species": BalancedAccuracyMetric(6),
+            "output_open": F1ScoreMetric(),
+            "output_insect": F1ScoreMetric(),
         },
     )
 
