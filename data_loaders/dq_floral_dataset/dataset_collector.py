@@ -52,6 +52,15 @@ class DQFloralDatasetCollector:
         self._walk_through_folders()
         self._print_statistics()
     
+    def get_number_of_species_classes(self) -> int:
+        return len(self._species)
+    
+    def get_number_of_bloom_classes(self) -> int:
+        return len(self._bloom)
+    
+    def get_number_of_beetle_classes(self) -> int:
+        return len(self._beetle)
+    
     def _get_image_label_encoding(self, species_label: str, bloom_label: str, beetle_label: str) -> List[int]:
         """Converts class names into labels index vector of the image.
 

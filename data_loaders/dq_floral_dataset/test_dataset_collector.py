@@ -2,7 +2,6 @@
 """
 
 from typing import Final
-from metron_shared import param_validators as param_val
 from .dataset_collector import DQFloralDatasetCollector
 
 DATASET_PATH: Final[str] = "/dq_floral_dataset"
