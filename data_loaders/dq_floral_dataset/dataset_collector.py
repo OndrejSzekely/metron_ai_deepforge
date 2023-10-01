@@ -9,14 +9,15 @@ import logging
 from os import path
 from metron_shared import param_validators as param_val
 
+
 class DQFloralDatasetCollector:
     """DQ Floral Dataset collector
-    
+
     Collects all image paths and corresponding labels.
-    
+
     Data collection type: In-memory
     RAM requirements: N/A
-    
+
     Atributes:
         root_folder (str): Dataset file system root path.
         seed (int): Random seed.
@@ -30,17 +31,15 @@ class DQFloralDatasetCollector:
         bloom (Final[str]): Recognition task name.
         beetle (Final[str]): Recognition task name.
     """
-    
-    _species: Final[List[str]] = ["Species_0", "Species_1", "Species_2", "Species_3" ,"Species_4", "Species_5"]
+
+    _species: Final[List[str]] = ["Species_0", "Species_1", "Species_2", "Species_3", "Species_4", "Species_5"]
     _bloom: Final[List[str]] = ["Bloom_0", "Bloom_1"]
     _beetle: Final[List[str]] = ["Beetle_0", "Beetle_1"]
     species: Final[str] = "species"
     bloom: Final[str] = "bloom"
     beetle: Final[str] = "beetle"
-    
-    
+
     def __init__(self, dataset_root_folder_path: str, seed: int = 1931992) -> None:
-        
         param_val.check_type(dataset_root_folder_path, str)
         param_val.check_type(seed, int)
 
@@ -51,16 +50,16 @@ class DQFloralDatasetCollector:
         self._stats = []
         self._walk_through_folders()
         self._print_statistics()
-    
+
     def get_number_of_species_classes(self) -> int:
         return len(self._species)
-    
+
     def get_number_of_bloom_classes(self) -> int:
         return len(self._bloom)
-    
+
     def get_number_of_beetle_classes(self) -> int:
         return len(self._beetle)
-    
+
     def _get_image_label_encoding(self, species_label: str, bloom_label: str, beetle_label: str) -> List[int]:
         """Converts class names into labels index vector of the image.
 
@@ -72,28 +71,29 @@ class DQFloralDatasetCollector:
         Returns:
             List[int]: List of 3 items. Class label id for given class types. The order is following: species, bloom, beetle.
         """
-        
+
         param_val.check_type(species_label, str)
         param_val.check_type(bloom_label, str)
         param_val.check_type(beetle_label, str)
-        
+
         return [self._species.index(species_label), self._bloom.index(bloom_label), self._beetle.index(beetle_label)]
-    
+
     def _walk_through_folders(self) -> None:
-        """Walks through dataset's subfolders and gathers image paths.
-        """
+        """Walks through dataset's subfolders and gathers image paths."""
         for species_label in self._species:
             for bloom_label in self._bloom:
                 for beetle_label in self._beetle:
                     images_gt_path = path.join(self.root_folder, species_label, bloom_label, beetle_label)
-                    
+
                     images_num = 0
                     if path.exists(images_gt_path):
                         for img_file in os.scandir(images_gt_path):
                             self._img_paths.append(img_file.path)
-                            self._img_labeles.append(self._get_image_label_encoding(species_label, bloom_label, beetle_label))
-                            images_num +=1
-                    
+                            self._img_labeles.append(
+                                self._get_image_label_encoding(species_label, bloom_label, beetle_label)
+                            )
+                            images_num += 1
+
                     self._stats.append((f"{species_label}/{bloom_label}/{beetle_label}:", images_num))
 
     def get_dataset(self) -> Dict[str, List]:
@@ -102,13 +102,10 @@ class DQFloralDatasetCollector:
         Returns:
             Dict[str, List]: Collected dataset.
         """
-        return {
-            "img_paths": self._img_paths,
-            "labels": self._img_labeles
-        }
+        return {"img_paths": self._img_paths, "labels": self._img_labeles}
 
     def _print_statistics(self) -> None:
-        logging.info("*"*15 + " DQ Floral Dataset Collector Stats " + "*"*15)
+        logging.info("*" * 15 + " DQ Floral Dataset Collector Stats " + "*" * 15)
         for stat_record in self._stats:
             logging.info(f"{stat_record[0]} {stat_record[1]}")
-        logging.info("*"*65)
+        logging.info("*" * 65)

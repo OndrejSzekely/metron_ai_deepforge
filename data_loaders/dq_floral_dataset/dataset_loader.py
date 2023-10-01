@@ -6,6 +6,7 @@ import tensorflow as tf
 from metron_shared import param_validators as param_val
 from .dataset_collector import DQFloralDatasetCollector
 
+
 class DQFloralDatasetLoader:
     """DQ Floral Dataset Loader
 
@@ -15,6 +16,7 @@ class DQFloralDatasetLoader:
     RAM requirements: N/A
 
     Attributes:
+        number_of_steps (int): Computed number of steps with respect to batch size.
         dataset_collector (DQFloralDatasetCollector): Dataset collector which provides metadata about the dataset.
         _img_paths (List[str]): Image file system paths.
         _img_labels (List[int]): Image labels.
@@ -23,8 +25,15 @@ class DQFloralDatasetLoader:
         _batch_size (int): Batch size.
     """
 
-    def __init__(self, dataset_collector: DQFloralDatasetCollector, img_paths: List[str], img_labels: List[List[int]], shuffle: bool, batch_size: int, seed: int = 19031992) -> None:
-
+    def __init__(
+        self,
+        dataset_collector: DQFloralDatasetCollector,
+        img_paths: List[str],
+        img_labels: List[List[int]],
+        shuffle: bool,
+        batch_size: int,
+        seed: int = 19031992,
+    ) -> None:
         param_val.check_type(dataset_collector, DQFloralDatasetCollector)
         param_val.check_type(img_paths, List[str])
         param_val.check_type(img_labels, List[List[int]])
@@ -39,6 +48,7 @@ class DQFloralDatasetLoader:
         self._records_num = len(img_paths)
         self._shuffle = shuffle
         self._batch_size = batch_size
+        self.number_of_steps = int(self._records_num / self._batch_size)
 
     def _load_image(self, img_path_tensor: tf.Tensor, img_label_tensor: tf.Tensor) -> Tuple[tf.Tensor, tf.Tensor]:
         """Dataset pipeline step which loads image.
@@ -55,7 +65,7 @@ class DQFloralDatasetLoader:
         img = tf.image.resize(img, size=[64, 64])
         return img, img_label_tensor
 
-    def _preprocess_label(self, img: tf.Tensor, label: tf.Tensor) -> Tuple[tf.Tensor, tf.Tensor]:
+    def _preprocess_label(self, img: tf.Tensor, label: tf.Tensor) -> Any:
         """Preprocess image label into one hot encoding.
 
         Args:
@@ -65,8 +75,12 @@ class DQFloralDatasetLoader:
         species_encoding = tf.one_hot(label[0], depth=self.dataset_collector.get_number_of_species_classes())
         bloom_encoding = tf.one_hot(label[1], depth=self.dataset_collector.get_number_of_bloom_classes())
         beetle_encoding = tf.one_hot(label[2], depth=self.dataset_collector.get_number_of_beetle_classes())
-        
-        return img, species_encoding, bloom_encoding, beetle_encoding
+
+        return {"input": img}, {
+            "output_species": species_encoding,
+            "output_open": bloom_encoding,
+            "output_insect": beetle_encoding,
+        }
 
     def __call__(self, *args: Any, **kwds: Any) -> Any:
         dataset = tf.data.Dataset.from_tensor_slices((self._img_paths, self._img_labels))
