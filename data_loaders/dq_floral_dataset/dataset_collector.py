@@ -48,6 +48,9 @@ class DQFloralDatasetCollector:
         self._img_paths = []
         self._img_labeles = []
         self._stats = []
+        self._species_dist = [0] * self.get_number_of_species_classes()
+        self._bloom_dist = [0] * self.get_number_of_bloom_classes()
+        self._beetle_dist = [0] * self.get_number_of_beetle_classes()
         self._walk_through_folders()
         self._print_statistics()
 
@@ -88,13 +91,18 @@ class DQFloralDatasetCollector:
                     images_num = 0
                     if path.exists(images_gt_path):
                         for img_file in os.scandir(images_gt_path):
+                            label_encoding = self._get_image_label_encoding(species_label, bloom_label, beetle_label)
                             self._img_paths.append(img_file.path)
-                            self._img_labeles.append(
-                                self._get_image_label_encoding(species_label, bloom_label, beetle_label)
-                            )
+                            self._img_labeles.append(label_encoding)
                             images_num += 1
+                            self._species_dist[label_encoding[0]] += 1
+                            self._bloom_dist[label_encoding[1]] += 1
+                            self._beetle_dist[label_encoding[2]] += 1
 
                     self._stats.append((f"{species_label}/{bloom_label}/{beetle_label}:", images_num))
+        self._stats.append((f"Species_dist:", self._species_dist))
+        self._stats.append((f"Bloom_dist:", self._bloom_dist))
+        self._stats.append((f"beetle_dist:", self._beetle_dist))
 
     def get_dataset(self) -> Dict[str, List]:
         """Returns the dataset.
