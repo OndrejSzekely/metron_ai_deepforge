@@ -1,0 +1,17 @@
+{
+    "name": "DeepForge (TensorFlow)",
+    "build": {
+        "dockerfile": "../../Dockerfile.tensorflow"
+    },
+    "runArgs": [
+        "--gpus",
+        "all",
+        "--ipc=host",
+        "--ulimit",
+        "memlock=-1",
+        "--ulimit",
+        "stack=67108864",
+        "--env-file",
+        ".env"
+    ]
+}
