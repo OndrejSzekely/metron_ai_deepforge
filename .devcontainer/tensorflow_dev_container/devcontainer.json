@@ -13,5 +13,12 @@
         "stack=67108864",
         "--env-file",
         ".env"
-    ]
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python"
+            ]
+        }
+    }
 }
