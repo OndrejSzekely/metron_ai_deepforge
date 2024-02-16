@@ -28,8 +28,10 @@
     sphinxemoji (=0.2.0)
     sphinx-design (=0.3.0)
     sphinx-book-theme (=1.0.0)
-    phinx-togglebutton (=0.3.2)
+    sphinx-togglebutton (=0.3.2)
     sphinx-copybutton (=0.5.1)
+    sphinxcontrib-mermaid (=0.8.1)
+    sphinx-subfigure (=0.2.4)
     ```
 
     ::::{admonition} Reference Installation Steps
