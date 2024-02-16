@@ -9,5 +9,15 @@ ENV DL_BACKEND=TENSORFLOW
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt && rm requirements.txt
 
+# Install docs pip requirements
+COPY requirements_docs.txt requirements_docs.txt
+RUN pip install -r requirements_docs.txt && rm requirements_docs.txt
+
+# Install dev pip requirements
+COPY requirements_dev.txt requirements_dev.txt
+RUN pip install -r requirements_dev.txt && rm requirements_dev.txt
+
 WORKDIR /
+# Entrypoin defined this way can't be overdriven
+ENTRYPOINT "/metron_ai_deepforge_repo/container_entry.sh"
 CMD [ "bash" ]
