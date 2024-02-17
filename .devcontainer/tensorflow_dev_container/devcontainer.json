@@ -14,6 +14,7 @@
         "--env-file",
         ".env"
     ],
+    "postStartCommand": "./.devcontainer/devcontainer_post_start.sh",
     "customizations": {
         "vscode": {
             "extensions": [
