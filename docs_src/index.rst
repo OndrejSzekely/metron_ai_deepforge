@@ -11,5 +11,9 @@ Metron AI - DeepForge Docs
    :caption: Contents:
 
    project_installation
+   architecture
+   project_structure
    guides
    development_notes
+   api_docs
+   release_page
