@@ -15,3 +15,5 @@ Metron AI - DeepForge Docs
    project_structure
    guides
    development_notes
+   api_docs
+   release_page
