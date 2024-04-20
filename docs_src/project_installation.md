@@ -1,6 +1,6 @@
 # Project Installation
 
-## Installation Steps
+## Runtime Setup
 
 ::::{admonition} Attention
 :class: warning
@@ -39,3 +39,26 @@ Follow the instruction steps.
     where `<BACKEND_TYPE>` can be of following options:
         - `pt` for `metron_ai/deepforge_pt` image
         - `tf` for `metron_ai/deepforge_tf` image
+
+## Development Setup
+
+::::{admonition} Attention
+:class: warning
+
+```{eval-rst}
+|:exclamation:| Docker is required. |:exclamation:|
+```
+
+::::
+
+::::{admonition} Attention
+:class: warning
+
+```{eval-rst}
+|:exclamation:| Visual Studio Code is required. |:exclamation:|
+```
+
+::::
+
+Open project in VSCODE as a Devcontainer. Then select which development environment you want to select from
+the dropdown.
