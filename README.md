@@ -1,4 +1,4 @@
-<h1 align="center">Metron AI - DeepForgea</h1>
+<h1 align="center">Metron AI - DeepForge</h1>
 
 <p align="center">
   <kbd><img src="docs_src/imgs/deepforge_logo.png" alt="DeepForge Logo" width="700"></kbd>
