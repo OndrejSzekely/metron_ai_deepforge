@@ -20,7 +20,10 @@
             "extensions": [
                 "ms-python.python",
                 "njpwerner.autodocstring",
-                "eamodio.gitlens"
+                "eamodio.gitlens",
+                "github.copilot",
+                "github.copilot-chat",
+                "amazonwebservices.amazon-q-vscode"
             ]
         }
     }
