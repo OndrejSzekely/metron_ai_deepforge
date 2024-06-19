@@ -7,3 +7,4 @@ sphinx-togglebutton==0.3.2
 sphinx-copybutton==0.5.1
 sphinxcontrib-mermaid==0.8.1
 sphinx-subfigure==0.2.4
+urllib3>=2.2.2 # not directly required, pinned by Snyk to avoid a vulnerability
