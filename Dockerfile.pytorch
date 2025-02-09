@@ -1,4 +1,4 @@
-FROM nvcr.io/nvidia/pytorch:24.11-py3
+FROM nvcr.io/nvidia/pytorch:25.01-py3
 ARG workdir_path=/tmp
 WORKDIR $workdir_path
 
