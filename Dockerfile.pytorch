@@ -1,21 +1,27 @@
-FROM nvcr.io/nvidia/pytorch:25.05-py3
-ARG workdir_path=/tmp
-WORKDIR $workdir_path
+FROM nvcr.io/nvidia/pytorch:25.05-py3 AS pytorch-base
 
 # Env variables
 ENV DL_BACKEND=PYTORCH
 
-# Install pip requirements
-COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt && rm requirements.txt
+# Install uv
+RUN pip install uv
 
-# Install docs pip requirements
-COPY requirements_docs.txt requirements_docs.txt
-RUN pip install -r requirements_docs.txt && rm requirements_docs.txt
+# [Optional] Add sudo support. Omit if you don't need to install software after connecting.
+ARG USERNAME=ubuntu
+RUN apt-get update \
+    && apt-get install -y sudo \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
 
-# Install dev pip requirements
-COPY requirements_dev.txt requirements_dev.txt
-RUN pip install -r requirements_dev.txt && rm requirements_dev.txt
+RUN sudo apt install locales && sudo locale-gen en_US.UTF-8
+
+FROM pytorch-base
+ARG workdir_path=/tmp
+WORKDIR $workdir_path
+
+COPY pyproject.toml pyproject.toml
+RUN sudo uv sync --all-groups --inexact && rm pyproject.toml
 
 WORKDIR /
+
 CMD [ "bash" ]

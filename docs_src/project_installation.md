@@ -1,6 +1,6 @@
 # Project Installation
 
-## Runtime Setup
+## Deployment Setup
 
 ::::{admonition} Attention
 :class: warning
