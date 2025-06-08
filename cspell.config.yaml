@@ -2,6 +2,6 @@ version: "0.2"
 ignorePaths: []
 dictionaryDefinitions: []
 dictionaries: []
-words: ["metron"]
+words: ["metron", "deepforge"]
 ignoreWords: []
 import: []

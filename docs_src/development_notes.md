@@ -28,8 +28,7 @@ the function / class method itself.
 
 Every commit has to pass through and be compliant with following tools:
 
-- *Black* (automatic styling formatting)
-- *Ruff* (linter)
+- *Ruff* (linter & formatter)
 - *PyRight* (type check)
 - *Bandit* (vulnerabilities check)
 
