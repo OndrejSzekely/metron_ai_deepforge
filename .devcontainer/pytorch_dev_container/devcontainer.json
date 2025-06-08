@@ -1,7 +1,11 @@
 {
     "name": "DeepForge (PyTorch)",
     "build": {
-        "dockerfile": "../../Dockerfile.pytorch"
+        "dockerfile": "../../Dockerfile.pytorch",
+        "target": "pytorch-base"
+    },
+    "buildOptions": {
+        "target": "pytorch-base"
     },
     "runArgs": [
         "--gpus",
@@ -22,9 +26,9 @@
                 "njpwerner.autodocstring",
                 "eamodio.gitlens",
                 "github.copilot",
-                "github.copilot-chat",
-                "amazonwebservices.amazon-q-vscode"
+                "github.copilot-chat"
             ]
         }
-    }
+    },
+    "remoteUser": "ubuntu"
 }

@@ -1,19 +1,32 @@
-[tool.black]
+[project]
+name = "metron_ai_deepforge"
+requires-python = ">=3.12"
+version = "0.1"
+
+[tool.uv]
+python-preference = "only-system"
+
+[tool.ruff]
 line-length = 120
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-)/
-'''
+include = ["*.py"]
 
 [tool.pytest.ini_options]
 pythonpath = "."
+
+[dependency-groups]
+docs = [
+    "myst-parser==1.0.0",
+    "sphinx~=5.2",
+    "sphinx-book-theme==1.1.0",
+    "sphinx-copybutton==0.5.1",
+    "sphinx-design==0.3.0",
+    "sphinx-subfigure==0.2.4",
+    "sphinx-togglebutton==0.3.2",
+    "sphinxcontrib-mermaid==0.8.1",
+    "sphinxemoji==0.2.0",
+]
+tools = [
+    "pre-commit>=4.2.0",
+    "pytest>=8.4.0",
+    "ruff>=0.11.12",
+]
