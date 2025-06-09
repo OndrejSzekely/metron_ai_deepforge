@@ -16,14 +16,14 @@ Metron AI DeepForge is AI/Deep Learning framework.
 ## Key Features <!-- omit in toc -->
 
 :boom: multi-framework support
-:boom: VSCODE devcontainer dev environment
+:boom: Devcontainer dev environment
 
 ## Table of Contents <!-- omit in toc -->
 - [Status](#status)
 - [Documentation](#documentation)
 
 ## Status
-[![License: GPL v3](https://img.shields.io/github/license/ondrejszekely/metron_ai_deepforge)](https://www.gnu.org/licenses/gpl-3.0) [![Release](https://img.shields.io/github/v/release/ondrejszekely/metron_ai_deepforge)](https://github.com/OndrejSzekely/metron_ai_deepforge/releases) [![Last commit](https://img.shields.io/github/last-commit/ondrejszekely/metron_ai_deepforge/develop)](https://github.com/OndrejSzekely/metron_ai_deepforge/compare/main...develop)
+[![License: GPL v3](https://img.shields.io/github/license/ondrejszekely/metron_ai_deepforge)](https://www.gnu.org/licenses/gpl-3.0) [![Release](https://img.shields.io/github/v/release/ondrejszekely/metron_ai_deepforge)](https://github.com/OndrejSzekely/metron_ai_deepforge/releases) [![Last commit](https://img.shields.io/github/last-commit/ondrejszekely/metron_ai_deepforge/main)](https://github.com/OndrejSzekely/metron_ai_deepforge/main)
 
 ## Documentation
 Online documentation of the latest commit on the *main* branch can be found [here](https://ondrejszekely.github.io/metron_ai_deepforge). *If you don't want to build a new documentation and use the build in the repository, go to step 5 directly*.
