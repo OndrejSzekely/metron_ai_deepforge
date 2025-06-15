@@ -1,10 +1,19 @@
-"""Asterisk v1
-"""
+# This file is part of the Metron AI ArDaGen (https://github.com/OndrejSzekely/metron_ai_ardagen).
+# Copyright (c) 2025 Ondrej Szekely.
+#
+# This program is free software: you can redistribute it and/or modify it under the terms of the
+# GNU General Public License as published by the Free Software Foundation, version 3. This program
+# is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+# Public License for more details. You should have received a copy of the GNU General Public
+# License along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+"""Asterisk v1"""
 
 import tensorflow as tf
-from tensorflow.keras.layers import Input, Conv2D, BatchNormalization
+from tensorflow.keras.layers import Conv2D, BatchNormalization
 from tensorflow.keras.layers import MaxPool2D, GlobalAvgPool2D
-from tensorflow.keras.layers import Add, ReLU, Dense
+from tensorflow.keras.layers import Add, ReLU
 
 
 def resnet_block(x, filters, reps, strides):

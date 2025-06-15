@@ -1,10 +1,18 @@
-"""Training script.
-"""
+# This file is part of the Metron AI ArDaGen (https://github.com/OndrejSzekely/metron_ai_ardagen).
+# Copyright (c) 2025 Ondrej Szekely.
+#
+# This program is free software: you can redistribute it and/or modify it under the terms of the
+# GNU General Public License as published by the Free Software Foundation, version 3. This program
+# is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+# Public License for more details. You should have received a copy of the GNU General Public
+# License along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+"""Training script."""
+
 import logging
 from typing import Final, Dict, Any
-from shutil import rmtree
 from os import path
-import os
 from sklearn.model_selection import KFold
 import tensorflow as tf
 from keras.layers import Input, Flatten, Dense, Dropout
@@ -78,7 +86,7 @@ def main():
     # dataset collection and splits setup
     dataset_collector = DQFloralDatasetCollector(DATASET_PATH)
     collected_dataset = dataset_collector.get_dataset()
-    splits_num = round(1./VAL_DATA_SIZE)
+    splits_num = round(1.0 / VAL_DATA_SIZE)
     kfold = KFold(n_splits=splits_num, shuffle=True, random_state=dataset_collector.seed)
 
     # setting up tb logger and tb folders
@@ -87,7 +95,7 @@ def main():
     create_tb_logging_folders(tb_logging_folder, exp_tb_logging_folder)
     tb_writer = tf.summary.create_file_writer(exp_tb_logging_folder)
 
-    #learning rate scheduler
+    # learning rate scheduler
     first_decay_steps = 60
     lr_decayed_fn = tf.keras.optimizers.schedules.CosineDecayRestarts(LR, first_decay_steps)
 
@@ -103,7 +111,6 @@ def main():
                 train_data_img_labels = [collected_dataset["labels"][ind] for ind in train_split_indices]
                 val_data_img_paths = [collected_dataset["img_paths"][ind] for ind in val_split_indices]
                 val_data_img_labels = [collected_dataset["labels"][ind] for ind in val_split_indices]
-                
 
                 log_funcs.log_kfold_split_info(len(train_data_img_paths), len(val_data_img_paths))
                 train_fold_labels_stat = compute_class_image_num(train_data_img_labels)
@@ -151,7 +158,7 @@ def main():
                 )
 
                 # callbacks
-                early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3)
+                early_stopping = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=3)
 
                 # train the model
                 kfold_history = model.fit(
@@ -160,7 +167,7 @@ def main():
                     steps_per_epoch=train_dataset_loader.number_of_steps,
                     validation_data=val_data,
                     validation_steps=train_dataset_loader.number_of_steps,
-                    #callbacks=[early_stopping]
+                    # callbacks=[early_stopping]
                 )
                 tf_log_history("kfold", kfold_history.history, split_ind)
 
@@ -198,9 +205,11 @@ def main():
         )
 
         # train the model
-        full_train_history = model.fit(train_data, epochs=EPOCHS_FULL_TRAINING, steps_per_epoch=train_dataset_loader.number_of_steps, callbacks=[])
+        full_train_history = model.fit(
+            train_data, epochs=EPOCHS_FULL_TRAINING, steps_per_epoch=train_dataset_loader.number_of_steps, callbacks=[]
+        )
         tf_log_full_history("full_training", full_train_history.history)
-        
+
         tb_writer.flush()
     model.save(path.join(OUTPUT_FOLDER, "asterisk.h5"))
 
