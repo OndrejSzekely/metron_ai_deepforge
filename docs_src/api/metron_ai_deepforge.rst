@@ -13,5 +13,5 @@ Subpackages
    metron_ai_deepforge.data_loaders
    metron_ai_deepforge.forge
    metron_ai_deepforge.metrics
-   metron_ai_deepforge.use_cases
+   metron_ai_deepforge.usecases
 
