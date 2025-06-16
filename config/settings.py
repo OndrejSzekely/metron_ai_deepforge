@@ -8,3 +8,22 @@
 # Public License for more details. You should have received a copy of the GNU General Public
 # License along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+"""Module containing DeepForge environment settings."""
+
+import os
+from dataclasses import dataclass
+from enum import StrEnum
+
+
+class AIBackend(StrEnum):
+    """Enum for AI backend options."""
+
+    PYTORCH = "pytorch"
+    TENSORFLOW = "tensorflow"
+
+
+@dataclass
+class DeepForgeSettings:
+    """Settings for the DeepForge environment."""
+
+    ai_backend: str = os.environ["AI_BACKEND"]
