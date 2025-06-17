@@ -1,4 +1,4 @@
-name: Rebuild DeepForge PyTorch Docker image
+name: Rebuild DeepForge PyTorch Docker image for ACR
 on:
   push:
     branches: ["main"]
@@ -22,11 +22,15 @@ jobs:
     steps:
       - name: Checkout DeepForge repo
         uses: actions/checkout@v4
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
+      - name: Login to Azure Container Registry
+        uses: azure/docker-login@v2
         with:
-          registry: ghcr.io
-          username: ${{github.actor}}
-          password: ${{secrets.GITHUB_TOKEN}}
+          login-server: ${{ vars.ACR_URL }}
+          username: ${{ fromJson(secrets.AZURE_CREDENTIALS).clientId }}
+          password: ${{ fromJson(secrets.AZURE_CREDENTIALS).clientSecret }}
+      - name: Build & push Docker image
+        run: |
+          docker build -t ${{ vars.ACR_URL }}/metron_ai/deepforge_pt -f Dockerfile.pytorch .
+          docker push ${{ vars.ACR_URL }}/metron_ai/deepforge_pt:latest
 
       
