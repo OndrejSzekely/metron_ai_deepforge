@@ -1,4 +1,4 @@
-# Documentation Architecture
+# Documentation Generation Architecture
 
 This section descibes the architecture of the documentation approach for Metron AI DeepForge.
 
