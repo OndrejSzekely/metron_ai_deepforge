@@ -6,3 +6,4 @@ Architecture
     :caption: Contents:
 
     arch/docs_arch
+    arch/azure_arch
