@@ -1,4 +1,3 @@
 __pycache__/
 docs/
-uv.lock
 .devcontainer/secrets
