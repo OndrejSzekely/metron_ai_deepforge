@@ -23,8 +23,9 @@ FROM tensorflow-base
 ARG workdir_path=/tmp
 WORKDIR $workdir_path
 
-COPY pyproject.toml pyproject.toml
-RUN sudo uv sync --all-groups --inexact && rm pyproject.toml
+# uv sync will use `uv.lock` if available
+COPY uv.lock pyproject.toml ./
+RUN sudo uv sync --all-groups --inexact && rm pyproject.toml uv.lock
 
 WORKDIR /
 
