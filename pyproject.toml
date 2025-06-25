@@ -1,6 +1,6 @@
 [project]
 name = "metron_ai_deepforge"
-requires-python = ">=3.12"
+requires-python = "^3.12"
 version = "0.1"
 
 [tool.uv]
