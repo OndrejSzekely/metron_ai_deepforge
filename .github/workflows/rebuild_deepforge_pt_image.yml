@@ -20,7 +20,7 @@ permissions:
 
 concurrency:
   group: "images"
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref }}
 
 jobs:
   build-image:

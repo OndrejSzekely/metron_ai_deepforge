@@ -19,7 +19,7 @@ permissions:
 
 concurrency:
   group: "envs"
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref }}
 
 jobs:
     setup-environment:
