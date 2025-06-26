@@ -51,3 +51,9 @@ jobs:
           azcliversion: latest
           inlineScript: |
             az acr build --registry ${{ vars.ACR_REGISTRY }} --image metron_ai/deepforge_pt:latest --file Dockerfile.pytorch .
+  final-success:
+    needs: [check-code-change, build-image]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mark workflow as complete
+        run: echo "Workflow completed successfully"
