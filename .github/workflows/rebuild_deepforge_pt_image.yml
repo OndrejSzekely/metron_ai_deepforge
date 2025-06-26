@@ -26,6 +26,8 @@ jobs:
   check-code-change:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout DeepForge repo
+        uses: actions/checkout@v4
       - name: Check code change
         uses: dorny/paths-filter@v3
         with:
