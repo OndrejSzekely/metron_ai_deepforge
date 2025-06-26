@@ -25,10 +25,13 @@ concurrency:
 jobs:
   check-code-change:
     runs-on: ubuntu-latest
+    outputs:
+      project_requirements: ${{ steps.code_check.outputs.project_requirements }}
     steps:
       - name: Checkout DeepForge repo
         uses: actions/checkout@v4
       - name: Check code change
+        id: code_check
         uses: dorny/paths-filter@v3
         with:
           filters: |
