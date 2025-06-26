@@ -19,24 +19,36 @@ permissions:
 
 concurrency:
   group: "envs"
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref }}
 
 jobs:
-    setup-environment:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout DeepForge repo
-              uses: actions/checkout@v4
-            - name: Install uv
-              uses: astral-sh/setup-uv@v5
-              with:
-                enable-cache: true
-                cache-dependency-glob: "uv.lock"
-            - name: Set up Python
-              run: uv venv
-            - name: Install PyTorch for CPU
-              run: uv pip install --requirements .github/pytorch_cpu_runner_requirements.txt
-            - name: Install project dependencies
-              run: uv sync --group devtools --all-extras --inexact --frozen
-            - name: Minimize uv cache
-              run: uv cache prune --ci
+  check-code-change:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check code change
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            project_requirements:
+              - 'Dockerfile.pytorch'
+              - 'pyproject.toml'
+  setup-environment:
+    needs: check-code-change
+    if: ${{ needs.check-code-change.outputs.project_requirements == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+        - name: Checkout DeepForge repo
+          uses: actions/checkout@v4
+        - name: Install uv
+          uses: astral-sh/setup-uv@v5
+          with:
+            enable-cache: true
+            cache-dependency-glob: "uv.lock"
+        - name: Set up Python
+          run: uv venv
+        - name: Install PyTorch for CPU
+          run: uv pip install --requirements .github/pytorch_cpu_runner_requirements.txt
+        - name: Install project dependencies
+          run: uv sync --group devtools --all-extras --inexact --frozen
+        - name: Minimize uv cache
+          run: uv cache prune --ci
