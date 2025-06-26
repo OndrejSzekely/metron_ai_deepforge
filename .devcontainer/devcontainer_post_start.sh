@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Install dependencies
-sudo uv sync --all-groups  --inexact 
+uv sync --group devtools --all-extras --inexact
 
 # Install pre-commit hooks
 pre-commit install

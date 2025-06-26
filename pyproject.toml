@@ -1,6 +1,6 @@
 [project]
 name = "metron_ai_deepforge"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<3.13"
 version = "0.1"
 
 [tool.uv]
@@ -13,7 +13,7 @@ include = ["*.py"]
 [tool.pytest.ini_options]
 pythonpath = "."
 
-[dependency-groups]
+[project.optional-dependencies]
 docs = [
     "myst-parser==1.0.0",
     "sphinx~=5.2",
@@ -25,7 +25,9 @@ docs = [
     "sphinxcontrib-mermaid==0.8.1",
     "sphinxemoji==0.2.0",
 ]
-tools = [
+
+[dependency-groups]
+devtools = [
     "pre-commit>=4.2.0",
     "pytest>=8.4.0",
     "ruff>=0.11.12",
