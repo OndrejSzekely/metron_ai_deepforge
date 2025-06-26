@@ -18,8 +18,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: "envs"
-  cancel-in-progress: ${{ github.ref }}
+  group: ${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   check-code-change:
