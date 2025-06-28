@@ -51,7 +51,7 @@ jobs:
           azcliversion: latest
           inlineScript: |
             az acr build --registry ${{ vars.ACR_REGISTRY }} --image metron_ai/deepforge_pt:latest --file Dockerfile.pytorch .
-  job-skipped:
+  skip-workflow:
     needs: check-code-change
     if: ${{ needs.check-code-change.outputs.project_requirements == 'false' }}
     runs-on: ubuntu-latest
