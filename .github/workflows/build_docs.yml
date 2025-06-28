@@ -1,0 +1,44 @@
+name: Build documentation
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-docs-src-change:
+    runs-on: ubuntu-latest
+    outputs:
+        docs_src_change: ${{ steps.check_docs_src_change.docs_src }}
+    steps:
+      - name: Checkout DeepForge repo
+        uses: actions/checkout@v4
+      - name: Check docs src change
+        id: check_docs_src_change
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            docs_src:
+                - 'docs_src/**'
+  build-docs:
+    needs: check-docs-src-change
+    if: ${{ needs.check-docs-src-change.outputs.docs_src == 'true' }}
+    uses: OndrejSzekely/metron_ai_deepforge/.github/workflows/set_up_deepforge_cpu_env.yml@main
+    steps:
+      - name: Build documentation
+        run: sphinx-build -b html docs_src docs
+  
+  skip-worflow:
+    needs: check-docs-src-change
+    if: ${{ needs.check-docs-src-change.outputs.docs_src == 'false' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skipping Action
+        run: echo "Action is skipped"
