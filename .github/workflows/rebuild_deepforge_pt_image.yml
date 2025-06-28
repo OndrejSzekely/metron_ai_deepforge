@@ -2,14 +2,8 @@ name: Rebuild DeepForge PyTorch Docker image in ACR
 on:
   push:
     branches: ["main"]
-    paths:
-      - Dockerfile.pytorch
-      - pyproject.toml
   pull_request:
     branches: ["main"]
-    paths:
-      - Dockerfile.pytorch
-      - pyproject.toml
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -19,7 +13,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -57,3 +51,10 @@ jobs:
           azcliversion: latest
           inlineScript: |
             az acr build --registry ${{ vars.ACR_REGISTRY }} --image metron_ai/deepforge_pt:latest --file Dockerfile.pytorch .
+  job-skipped:
+    needs: check-code-change
+    if: ${{ needs.check-code-change.outputs.project_requirements == 'false' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skipping Action
+        run: echo "Action is skipped"
