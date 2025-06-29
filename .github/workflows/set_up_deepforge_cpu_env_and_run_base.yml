@@ -35,3 +35,6 @@ jobs:
           run: uv sync --group devtools --all-extras --inexact --frozen
         - name: Minimize uv cache
           run: uv cache prune --ci
+        - name: Execute custom commands
+          if: ${{ inputs.run_commands != '' }}
+          run: ${{ inputs.run_commands }}
