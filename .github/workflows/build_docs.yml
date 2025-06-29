@@ -11,6 +11,7 @@ on:
 permissions:
   contents: read
   pages: write
+  id-token: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -49,7 +50,7 @@ jobs:
       - name: Download built docs
         uses: actions/download-artifact@v4
         with:
-          artifact-ids: ${{ steps.build-docs.outputs.upload_id }}
+          artifact-ids: ${{ needs.build-docs.outputs.upload_id }}
           path: ${{ env.TEMP_DOCS_DIR }}
       - name: Upload docs to GitHub Pages
         uses: actions/upload-pages-artifact@v3
