@@ -23,7 +23,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  setup-environment:
+  setup-environment_and_run:
     runs-on: ubuntu-latest
     steps:
         - name: Checkout DeepForge repo
