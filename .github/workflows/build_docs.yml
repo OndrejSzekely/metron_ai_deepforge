@@ -27,13 +27,12 @@ jobs:
           filters: |
             docs_src:
                 - 'docs_src/**'
-  setup-env:
-    needs: check-docs-src-change
-    if: ${{ needs.check-docs-src-change.outputs.docs_src == 'true' }}
-    uses: OndrejSzekely/metron_ai_deepforge/.github/workflows/set_up_deepforge_cpu_env.yml@main
+  setup-environment:
+    uses: OndrejSzekely/metron_ai_deepforge/.github/workflows/set_up_deepforge_cpu_env_base.yml@feature/add-docs-build-workflow
+    if: ${{ needs.check-code-change.outputs.docs_src_change == 'true' }}
 
   build-docs:
-    needs: setup-env
+    needs: setup-environment
     runs-on: ubuntu-latest
     steps:
       - name: Build documentation
