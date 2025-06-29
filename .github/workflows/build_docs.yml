@@ -26,7 +26,7 @@ jobs:
         with:
           filters: |
             docs_src:
-                - 'docs_src/**'
+              - 'docs_src/**'
   setup-environment:
     needs: check-docs-src-change
     if: ${{ needs.check-docs-src-change.outputs.docs_src_change == 'true' }}
