@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Build documentation
-        run: sphinx-build -b html docs_src docs
+        run: uv run sphinx-build -b html docs_src docs
   skip-workflow:
     needs: check-docs-src-change
     if: ${{ needs.check-docs-src-change.outputs.docs_src_change == 'false' }}
