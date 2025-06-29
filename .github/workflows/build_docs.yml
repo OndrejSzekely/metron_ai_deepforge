@@ -10,10 +10,14 @@ on:
 
 permissions:
   contents: read
+  pages: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
+env:
+  TEMP_DOCS_DIR: docs
 
 jobs:
   check-docs-src-change:
@@ -30,14 +34,30 @@ jobs:
           filters: |
             docs_src:
               - 'docs_src/**'
-  build-docs:
+  build-and-deploy-docs:
     needs: check-docs-src-change
     #if: ${{ needs.check-docs-src-change.outputs.docs_src_change == 'true' }}
-    uses: OndrejSzekely/metron_ai_deepforge/.github/workflows/set_up_deepforge_cpu_env_and_run_base.yml@feature/add-docs-build-workflow
-    with:
-      run_commands: uv run sphinx-build -b html docs_src docs
-      upload_name: built_docs
-      upload_path: docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build docs
+        uses: OndrejSzekely/metron_ai_deepforge/.github/workflows/set_up_deepforge_cpu_env_and_run_base.yml@feature/add-docs-build-workflow
+        with:
+          run_commands: uv run sphinx-build -b html docs_src docs
+          upload_name: built_docs
+          upload_path: docs
+      - name: Download built docs
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ steps.build-docs.outputs.upload_id }}
+          path: ${{ env.TEMP_DOCS_DIR }}
+      - name: Upload docs to GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ env.TEMP_DOCS_DIR }}
+          retention-days: 1
+      - name: Deploy GitHub Pages
+        uses: actions/deploy-pages@v4
+
   skip-workflow:
     needs: check-docs-src-change
     if: ${{ needs.check-docs-src-change.outputs.docs_src_change == 'false' }}
