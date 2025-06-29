@@ -34,7 +34,10 @@ jobs:
   setup-environment:
     needs: check-code-change
     if: ${{ needs.check-code-change.outputs.project_requirements == 'true' }}
-    uses: OndrejSzekely/metron_ai_deepforge/.github/workflows/set_up_deepforge_cpu_env_base.yml@feature/add-docs-build-workflow
+    uses: OndrejSzekely/metron_ai_deepforge/.github/workflows/set_up_deepforge_cpu_env_and_run_base.yml@feature/add-docs-build-workflow
+    with:
+      run_commands: |
+        echo "DeepForge CPU environment successfully initialized"
   skip-workflow:
     needs: check-code-change
     if: ${{ needs.check-code-change.outputs.project_requirements == 'false' }}
