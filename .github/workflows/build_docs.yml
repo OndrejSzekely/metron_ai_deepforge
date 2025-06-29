@@ -36,6 +36,8 @@ jobs:
     uses: OndrejSzekely/metron_ai_deepforge/.github/workflows/set_up_deepforge_cpu_env_and_run_base.yml@feature/add-docs-build-workflow
     with:
       run_commands: uv run sphinx-build -b html docs_src docs
+      upload_name: built_docs
+      upload_path: docs
   skip-workflow:
     needs: check-docs-src-change
     if: ${{ needs.check-docs-src-change.outputs.docs_src_change == 'false' }}

@@ -5,6 +5,12 @@ on:
       run_commands:
         required: false
         type: string
+      upload_name:
+        required: false
+        type: string
+      upload_path:
+        required: false
+        type: string
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -38,3 +44,9 @@ jobs:
         - name: Execute custom commands
           if: ${{ inputs.run_commands != '' }}
           run: ${{ inputs.run_commands }}
+        - name: Upload artefacts
+          if: ${{ inputs.upload_name != '' && inputs.upload_path != '' }}
+          uses: actions/upload-artifact@v4
+          with:
+            name: ${{ inputs.upload_name }}
+            path: ${{ inputs.upload_path }}
