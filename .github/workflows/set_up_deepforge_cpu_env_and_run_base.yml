@@ -50,3 +50,4 @@ jobs:
           with:
             name: ${{ inputs.upload_name }}
             path: ${{ inputs.upload_path }}
+            retention-days: 1
