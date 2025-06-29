@@ -19,7 +19,7 @@ jobs:
   check-docs-src-change:
     runs-on: ubuntu-latest
     outputs:
-        docs_src_change: ${{ steps.check_docs_src_change.docs_src }}
+      docs_src_change: ${{ steps.check_docs_src_change.docs_src }}
     steps:
       - name: Checkout DeepForge repo
         uses: actions/checkout@v4
