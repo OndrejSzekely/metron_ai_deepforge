@@ -32,6 +32,7 @@ jobs:
               - 'Dockerfile.pytorch'
               - 'pyproject.toml'
   setup-environment:
+    needs: check-code-change
     uses: OndrejSzekely/metron_ai_deepforge/.github/workflows/set_up_deepforge_cpu_env_base.yml@feature/add-docs-build-workflow
     if: ${{ needs.check-code-change.outputs.project_requirements == 'true' }}
   skip-workflow:
