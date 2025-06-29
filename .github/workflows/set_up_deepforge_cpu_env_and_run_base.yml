@@ -1,6 +1,10 @@
-name: Set up DeepForge CPU Environment
+name: Set up DeepForge CPU Environment & Run command
 on:
   workflow_call:
+    inputs:
+      run_commands:
+        required: false
+        type: string
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
