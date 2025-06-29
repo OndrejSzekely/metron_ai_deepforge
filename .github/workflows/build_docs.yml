@@ -30,16 +30,12 @@ jobs:
           filters: |
             docs_src:
               - 'docs_src/**'
-  setup-environment:
+  build-docs:
     needs: check-docs-src-change
     #if: ${{ needs.check-docs-src-change.outputs.docs_src_change == 'true' }}
-    uses: OndrejSzekely/metron_ai_deepforge/.github/workflows/set_up_deepforge_cpu_env_base.yml@feature/add-docs-build-workflow
-  build-docs:
-    needs: setup-environment
-    runs-on: ubuntu-latest
-    steps:
-      - name: Build documentation
-        run: uv run sphinx-build -b html docs_src docs
+    uses: OndrejSzekely/metron_ai_deepforge/.github/workflows/set_up_deepforge_cpu_env_and_run_base.yml@feature/add-docs-build-workflow
+    with:
+      run_commands: uv run sphinx-build -b html docs_src docs
   skip-workflow:
     needs: check-docs-src-change
     if: ${{ needs.check-docs-src-change.outputs.docs_src_change == 'false' }}
