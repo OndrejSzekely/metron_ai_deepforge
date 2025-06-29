@@ -31,17 +31,15 @@ jobs:
     needs: check-docs-src-change
     if: ${{ needs.check-docs-src-change.outputs.docs_src_change == 'true' }}
     uses: OndrejSzekely/metron_ai_deepforge/.github/workflows/set_up_deepforge_cpu_env_base.yml@feature/add-docs-build-workflow
-
   build-docs:
     needs: setup-environment
     runs-on: ubuntu-latest
     steps:
       - name: Build documentation
         run: sphinx-build -b html docs_src docs
-  
   skip-worflow:
     needs: check-docs-src-change
-    if: ${{ needs.check-docs-src-change.outputs.docs_src_change == 'false' }}
+    if: ${{ needs.check-docs-src-change.outputs.docs_src == 'false' }}
     runs-on: ubuntu-latest
     steps:
       - name: Skipping Action
