@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  TEMP_DOCS_DIR: docs
+  TEMP_BUILT_DOCS_DIR: built_docs
 
 jobs:
   check-docs-src-change:
@@ -41,7 +41,7 @@ jobs:
     uses: OndrejSzekely/metron_ai_deepforge/.github/workflows/set_up_deepforge_cpu_env_and_run_base.yml@feature/add-docs-build-workflow
     with:
       run_commands: uv run sphinx-build -b html docs_src docs
-      upload_name: built_docs
+      upload_name: ${{ env.TEMP_BUILT_DOCS_DIR }}
       upload_path: docs
   deploy-docs:
     needs: build-docs
@@ -51,11 +51,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           artifact-ids: ${{ needs.build-docs.outputs.upload_id }}
-          path: ${{ env.TEMP_DOCS_DIR }}
       - name: Upload docs to GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ env.TEMP_DOCS_DIR }}
+          path: ${{ env.TEMP_BUILT_DOCS_DIR }}
           retention-days: 1
       - name: Deploy GitHub Pages
         uses: actions/deploy-pages@v4
