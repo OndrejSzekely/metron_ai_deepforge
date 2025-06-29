@@ -33,10 +33,7 @@ jobs:
               - 'pyproject.toml'
   setup-environment:
     uses: OndrejSzekely/metron_ai_deepforge/.github/workflows/set_up_deepforge_cpu_env_base.yml@feature/add-docs-build-workflow
-<<<<<<< HEAD
     if: ${{ needs.check-code-change.outputs.project_requirements == 'true' }}
-=======
->>>>>>> 4d7c189 (test: Set feature branch as the reference one)
   skip-workflow:
     needs: check-code-change
     if: ${{ needs.check-code-change.outputs.project_requirements == 'false' }}
