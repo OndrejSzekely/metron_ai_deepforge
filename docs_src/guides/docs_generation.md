@@ -80,18 +80,7 @@
 ## Manual API Docs Source Files Generation
 
 1. Go into the project root folder.
-   
-   ::::{admonition} Reference Installation Steps
-   :class: tip, dropdown
-
-   :::{eval-rst}
-   |:point_right:| In repository's root folder activate the environment:
-   :::
-   ```shell
-   conda activate metron_dev_37
-   ```
-   ::::
 2. Execute following command:
     ```shell
-    sphinx-apidoc -o docs_src/api -f -t docs_src/_template  --private --module-first -d 1 --no-toc -e  .
+    uv run sphinx-apidoc -o docs_src/api -f -t docs_src/_template  --private --module-first -d 1 --no-toc -e  .
     ```
