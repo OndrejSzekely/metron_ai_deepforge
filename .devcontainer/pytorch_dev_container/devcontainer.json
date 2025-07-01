@@ -4,9 +4,6 @@
         "dockerfile": "../../Dockerfile.pytorch",
         "target": "pytorch-base"
     },
-    "buildOptions": {
-        "target": "pytorch-base"
-    },
     "runArgs": [
         "--gpus",
         "all",
