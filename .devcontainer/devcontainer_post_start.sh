@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Install dependencies
-uv sync --group devtools --all-extras --inexact
+sudo uv sync --group devtools --all-extras --inexact
 
 # Install pre-commit hooks
-pre-commit install
+sudo pre-commit install
 
 # Load all secret enviromental variables
 SECRET_ENV_DIR="./.devcontainer/secrets"
