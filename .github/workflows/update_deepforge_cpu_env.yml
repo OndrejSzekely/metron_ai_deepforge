@@ -31,11 +31,11 @@ jobs:
             project_requirements:
               - 'Dockerfile.pytorch'
               - 'pyproject.toml'
-  setup-deepforge-env-and-run:
+  call-setup-deepforge-env-and-run:
     needs: check-code-change
-    if: ${{ needs.check-code-change.outputs.project_requirements == 'true' }}
     uses: OndrejSzekely/metron_ai_deepforge/.github/workflows/set_up_deepforge_cpu_env_and_run_base.yml@main
     with:
+      if: ${{ needs.check-code-change.outputs.project_requirements == 'true' }}
       run_commands: |
         echo "DeepForge CPU environment successfully initialized"
   skip-workflow:

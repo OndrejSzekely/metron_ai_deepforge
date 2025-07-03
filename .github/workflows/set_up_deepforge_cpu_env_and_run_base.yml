@@ -2,6 +2,9 @@ name: Set up DeepForge CPU Environment & Run command
 on:
   workflow_call:
     inputs:
+      if:
+        required: true
+        type: boolean
       run_commands:
         required: false
         type: string

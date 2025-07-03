@@ -32,16 +32,16 @@ jobs:
           filters: |
             docs_src:
               - 'docs_src/**'
-  build-docs:
+  call-build-docs:
     needs: check-docs-src-change
-    if: ${{ needs.check-docs-src-change.outputs.docs_src_change == 'true' }}
     uses: OndrejSzekely/metron_ai_deepforge/.github/workflows/set_up_deepforge_cpu_env_and_run_base.yml@main
     with:
+      if: ${{ needs.check-docs-src-change.outputs.docs_src_change == 'true' }}
       run_commands: uv run sphinx-build -b html docs_src docs
       upload_name: built_docs
       upload_path: docs
   deploy-docs:
-    needs: build-docs
+    needs: call-build-docs
     runs-on: ubuntu-latest
     steps:
       - name: Download built docs
