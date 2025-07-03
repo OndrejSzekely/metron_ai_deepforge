@@ -31,6 +31,7 @@ concurrency:
 
 jobs:
   setup-environment_and_run:
+    if: ${{ inputs.if }}
     runs-on: ubuntu-latest
     outputs:
       upload_id: ${{ steps.upload_artefacts.outputs.artifact-id }}
