@@ -78,3 +78,4 @@ repos:
         name: build sphinx docs
         language: system
         entry: bash -c 'sphinx-build -b html docs_src docs || true'
+        files: ^docs_src/
