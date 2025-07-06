@@ -73,10 +73,11 @@ repos:
         language: system
         entry: bash -c 'sphinx-apidoc -o docs_src/api -f -t docs_src/_template  --private --module-first -d 1 --no-toc -e  . || true'
         files: \.py$
+        exclude: ^usecases
 -   repo: local
     hooks:
     -   id: sphinx
         name: build sphinx docs
         language: system
         entry: bash -c 'sphinx-build -b html docs_src docs || true'
-        files: ^docs_src/
+        files: ^docs_src
