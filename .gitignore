@@ -1,6 +1,6 @@
 __pycache__/
 docs/
-.devcontainer/**/devcontainer.override.json
 .devcontainer/secrets
 .vscode
 .ruff_cache
+external/
