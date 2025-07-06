@@ -72,6 +72,7 @@ repos:
         name: create API docs
         language: system
         entry: bash -c 'sphinx-apidoc -o docs_src/api -f -t docs_src/_template  --private --module-first -d 1 --no-toc -e  . || true'
+        files: \.py$
 -   repo: local
     hooks:
     -   id: sphinx
