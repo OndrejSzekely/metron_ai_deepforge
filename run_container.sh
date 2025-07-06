@@ -37,8 +37,6 @@ done
 container_id=$(docker run --rm -t --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 \
   --env-file .env ${mounted_volumes} -v $(pwd):/metron_ai_deepforge_repo \
   --user "$(id -u):$(id -g)" \
-  --volume "/etc/passwd:/etc/passwd:ro" \
-  --volume "/etc/group:/etc/group:ro" \
   --volume "${HOME}:/${HOME}:ro" \
   --name metron_ai_deepforge_${arg_backend} \
   --detach \
