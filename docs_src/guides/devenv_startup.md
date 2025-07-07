@@ -2,7 +2,8 @@
 
 *DeepForge* requires following variables available in your host environment to run devcontainer:
 
-- `DATASTORE_PATH`: A path to a dataset folder on the host machine. Pointed folder is mounted to the devcontainer. 
+- `DATASTORE_PATH`: A path to a dataset folder on the host machine. Pointed folder is mounted to the devcontainer on
+path `/mnt/datastore/`. 
 
 :::{attention}
 There is no general *VSCODE* environmental variables management. Variables must be available in the shell which starts
