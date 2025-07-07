@@ -13,7 +13,9 @@
         "--ulimit",
         "stack=67108864",
         "--env-file",
-        ".env"
+        ".env.container",
+        "--volume",
+        "${env:DATASTORE_PATH}:/mnt/datastore"
     ],
     "postStartCommand": "./.devcontainer/devcontainer_post_start.sh",
     "customizations": {

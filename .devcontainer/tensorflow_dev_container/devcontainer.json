@@ -12,7 +12,7 @@
         "--ulimit",
         "stack=67108864",
         "--env-file",
-        ".env"
+        ".env.container"
     ],
     "postStartCommand": "./.devcontainer/devcontainer_post_start.sh",
     "customizations": {

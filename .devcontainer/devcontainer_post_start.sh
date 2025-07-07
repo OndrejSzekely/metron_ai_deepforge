@@ -15,7 +15,7 @@ if [ ! -d "$SECRET_ENV_DIR" ]; then
 fi
 echo "Appending secret env variables into $BASHRC"
 
-for env_file in "$SECRET_ENV_DIR"/*.env; do
+for env_file in "$SECRET_ENV_DIR"/*.env.container; do
   [ -e "$env_file" ] || continue  # skip if no matching files
   echo "Processing secret env file $env_file..."
 
