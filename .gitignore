@@ -1,6 +1,7 @@
 __pycache__/
 docs/
+external/
 .devcontainer/secrets
 .vscode
 .ruff_cache
-external/
+.env
