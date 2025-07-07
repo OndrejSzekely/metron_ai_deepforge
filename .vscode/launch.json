@@ -6,24 +6,13 @@
     "configurations": [
         {
             "name": "Python: Current File",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true,
             "env": {
                 "PYTHONPATH": "${workspaceRoot}:",
-            }
-        },
-        {
-            "name": "Run Training",
-            "type": "python",
-            "request": "launch",
-            "program": "use_cases/asterisk/run_training.py",
-            "console": "integratedTerminal",
-            "justMyCode": true,
-            "env": {
-                "PYTHONPATH": "${workspaceRoot}:"
             }
         }
     ]
