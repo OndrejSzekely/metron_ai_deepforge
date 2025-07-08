@@ -15,7 +15,7 @@
         "--env-file",
         ".env.container",
         "--volume",
-        "${env:DATASTORE_PATH}:/mnt/datastore"
+        "${env:METRON_AI_CATALOGUE_HOST_PATH}:/mnt/catalogue"
     ],
     "postStartCommand": "./.devcontainer/devcontainer_post_start.sh",
     "customizations": {
