@@ -11,8 +11,9 @@
 """Lecture by Andrej Karpathy on building a GPT-like model from scratch."""
 
 import logging
+import os
 
-SHAKESPEARE_INPUT_TEXT: str = "/mnt/datastore/datasets/sample/tinyshakespeare/input.txt"
+SHAKESPEARE_INPUT_TEXT: str = "datasets/sample/tinyshakespeare/input.txt"
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -23,7 +24,7 @@ def main():
     """Main function to run the script."""
 
     # Read Shakespeare text from a file into <text>
-    with open(SHAKESPEARE_INPUT_TEXT, "r", encoding="utf-8") as f:
+    with open(os.path.join(os.environ["METRON_AI_CATALOGUE_PATH"], SHAKESPEARE_INPUT_TEXT), "r", encoding="utf-8") as f:
         text = f.read()
 
     # Get vocabulary size
