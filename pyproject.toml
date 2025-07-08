@@ -29,6 +29,7 @@ docs = [
 [dependency-groups]
 devtools = [
     "pre-commit>=4.2.0",
+    "pyright>=1.1.402",
     "pytest>=8.4.0",
     "ruff>=0.11.12",
 ]
