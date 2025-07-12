@@ -13,7 +13,10 @@
 import logging
 import os
 
+import torch
+
 SHAKESPEARE_INPUT_TEXT: str = "datasets/sample/tinyshakespeare/input.txt"
+TRAIN_DATA_FRACTION: float = 0.9
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -31,6 +34,26 @@ def main():
     chars = sorted(list(set(text)))
     vocab_size = len(chars)
     logger.info(f"Vocabulary size: {vocab_size}")
+
+    # Create characters <-> integers mappings
+    stoi = {ch: i for i, ch in enumerate(chars)}
+    # itos = {i: ch for i, ch in enumerate(chars)}
+
+    # Define encoding/decoding functions
+    encode = lambda s: [stoi[c] for c in s]  # noqa: E731
+    # decode = lambda l: "".join([itos[i] for i in l])
+
+    # Encode the text into tensor
+    data = torch.tensor(encode(text), dtype=torch.long)
+    logger.info(f"Data tensor shape: {data.shape}")
+    logger.info(f"Data tensor type: {data.dtype}")
+
+    # Data split
+    split_idx = int(len(data) * TRAIN_DATA_FRACTION)
+    train_data = data[:split_idx]
+    val_data = data[split_idx:]
+    logger.info(f"Train data size: {len(train_data)}")
+    logger.info(f"Validation data size: {len(val_data)}")
 
 
 if __name__ == "__main__":
