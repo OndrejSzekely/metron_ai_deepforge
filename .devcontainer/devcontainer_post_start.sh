@@ -15,7 +15,7 @@ if [ ! -d "$SECRET_ENV_DIR" ]; then
 fi
 echo "Appending secret env variables into $BASHRC"
 
-for env_file in "$SECRET_ENV_DIR"/*.env.container; do
+for env_file in "$SECRET_ENV_DIR"/*.env; do
   [ -e "$env_file" ] || continue  # skip if no matching files
   echo "Processing secret env file $env_file..."
 
@@ -38,5 +38,6 @@ for env_file in "$SECRET_ENV_DIR"/*.env.container; do
 
       # Append to .bashrc
       echo "export $key=\"$value\"" >> "$BASHRC"
+      echo "export $key=\"$value\""
   done < "$env_file"
 done
