@@ -13,14 +13,14 @@ permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}
 
 jobs:
   check-code-change:
     runs-on: ubuntu-latest
     outputs:
       project_requirements: ${{ steps.code_check.outputs.project_requirements }}
+      files_context_hash: ${{ steps.compute_sha_tag.outputs.files_context_hash }}
     steps:
       - name: Checkout DeepForge repo
         uses: actions/checkout@v4
@@ -32,6 +32,13 @@ jobs:
             project_requirements:
               - 'Dockerfile.pytorch'
               - 'pyproject.toml'
+              - 'uv.lock'
+      - name: Compute new image tag from files context
+        id: compute_sha_tag
+        run: |
+          source .github/workflows/scripts/get_files_context_hash.sh && 
+          HASH=$(get_files_context_hash "Dockerfile.pytorch pyproject.toml uv.lock") &&
+          echo "files_context_hash=$HASH" >> $GITHUB_OUTPUT
   build-image:
     needs: check-code-change
     if: ${{ needs.check-code-change.outputs.project_requirements == 'true' }}
@@ -45,12 +52,71 @@ jobs:
           client-id: ${{ fromJson(secrets.AZURE_CREDENTIALS).clientId }}
           tenant-id: ${{ fromJson(secrets.AZURE_CREDENTIALS).tenantId }}
           subscription-id: ${{ fromJson(secrets.AZURE_CREDENTIALS).subscriptionId }}
-      - name: Rebuild Docker image
+      - name: Check if repository exists in ACR
+        id: check_if_repository_exists_in_acr
         uses: azure/cli@v2
         with:
           azcliversion: latest
           inlineScript: |
-            az acr build --registry ${{ vars.ACR_REGISTRY }} --image metron_ai/deepforge_pt:latest --file Dockerfile.pytorch .
+            az acr repository list --name ${{ vars.ACR_REGISTRY }} --output tsv | grep -Fxq ${{ vars.ACR_DEEPFORGE_PT_REPOSITORY }} && \
+            REPOSITORY_EXISTS="true" || REPOSITORY_EXISTS="false"
+            echo "repository_exists=$REPOSITORY_EXISTS" >> $GITHUB_OUTPUT
+      - name: Check if Docker image is already built in ACR by SHA image tag
+        id: check_if_image_exists_in_acr
+        if: ${{ steps.check_if_repository_exists_in_acr.outputs.repository_exists == 'true' }}
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            TAG=$(
+              az acr repository show-tags \
+                --name ${{ vars.ACR_REGISTRY }} \
+                --repository metron_ai/deepforge_pt \
+                --query "[?@=='${{ needs.check-code-change.outputs.files_context_hash }}']" \
+                --output tsv
+            )
+            if [ -n "$TAG" ]; then
+              TAG_EXISTS="true"
+            else
+              TAG_EXISTS="false"
+            fi
+            echo "tag_exists=$TAG_EXISTS" >> $GITHUB_OUTPUT
+      - name: Get latest Docker image digest
+        id: get_latest_docker_image_digest
+        if: ${{ steps.check_if_repository_exists_in_acr.outputs.repository_exists == 'true' }}
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            read DIGEST SHA <<< "$(az acr manifest list-metadata --output tsv \
+              --query "[?tags != null && contains(tags, 'latest')].[digest, tags[?@ != 'latest'] | [0]]" \
+              --registry ${{ vars.ACR_REGISTRY }} \
+              --name ${{ vars.ACR_DEEPFORGE_PT_REPOSITORY }})"
+            echo "latest_image_digest=$DIGEST" >> $GITHUB_OUTPUT
+            echo "latest_image_sha=$SHA" >> $GITHUB_OUTPUT
+      - name: Rebuild Docker image
+        if: ${{ steps.check_if_image_exists_in_acr.outputs.tag_exists == 'false' || 
+          steps.check_if_repository_exists_in_acr.outputs.repository_exists == 'false'
+          }}
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az acr build --registry ${{ vars.ACR_REGISTRY }} \
+            --image ${{ vars.ACR_DEEPFORGE_PT_REPOSITORY }}:${{ needs.check-code-change.outputs.image_files_context_hash }} \
+            --image ${{ vars.ACR_DEEPFORGE_PT_REPOSITORY }}:latest --file Dockerfile.pytorch .
+      - name: Delete depricated latest Docker image
+        if: ${{ 
+          steps.check_if_repository_exists_in_acr.outputs.repository_exists == 'true' &&
+          needs.check-code-change.outputs.image_files_context_hash != steps.get_latest_docker_image_digest.outputs.latest_image_sha
+          }}
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az acr repository delete --name ${{ vars.ACR_REGISTRY }} \
+            --image metron_ai/deepforge_pt@${{ steps.get_latest_deepforge_docker_image_digest.outputs.digest_of_latest_image }} --yes
+      
   skip-workflow:
     needs: check-code-change
     if: ${{ needs.check-code-change.outputs.project_requirements == 'false' }}
