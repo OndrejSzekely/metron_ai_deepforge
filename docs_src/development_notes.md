@@ -22,7 +22,7 @@ the function / class method itself.
 
 ## Python Guidelines
 
-**Max Line Length**: It is set to 120 characters.
+**Max Line Length**: It is set to 150 characters.
 
 ### Commits Validation
 

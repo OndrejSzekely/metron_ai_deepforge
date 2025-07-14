@@ -7,7 +7,7 @@ version = "0.1"
 python-preference = "only-system"
 
 [tool.ruff]
-line-length = 120
+line-length = 150
 include = ["*.py"]
 
 [tool.pytest.ini_options]
