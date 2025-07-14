@@ -14,7 +14,7 @@ RUN apt-get update \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
 # Fix GIT commit error
-RUN sudo apt install locales && sudo locale-gen en_US.UTF-8
+RUN sudo apt install -y locales && sudo locale-gen en_US.UTF-8
 
 # Install Azure CLI
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
