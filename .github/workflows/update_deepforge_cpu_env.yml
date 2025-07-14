@@ -31,6 +31,7 @@ jobs:
             project_requirements:
               - 'Dockerfile.pytorch'
               - 'pyproject.toml'
+              - 'uv.lock'
   call-setup-deepforge-env-and-run:
     needs: check-code-change
     uses: OndrejSzekely/metron_ai_deepforge/.github/workflows/set_up_deepforge_cpu_env_and_run_base.yml@main
