@@ -38,6 +38,5 @@ for env_file in "$SECRET_ENV_DIR"/*.env; do
 
       # Append to .bashrc
       echo "export $key=\"$value\"" >> "$BASHRC"
-      echo "export $key=\"$value\""
   done < "$env_file"
 done
