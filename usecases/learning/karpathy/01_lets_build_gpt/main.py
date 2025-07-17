@@ -14,13 +14,18 @@ import logging
 import os
 
 import torch
+from utils import Dataset, Split
 
 SHAKESPEARE_INPUT_TEXT: str = "datasets/sample/tinyshakespeare/input.txt"
 TRAIN_DATA_FRACTION: float = 0.9
+BLOCK_SIZE: int = 8
+BATCH_SIZE: int = 4
 
 # Setup logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
+
+torch.manual_seed(1337)
 
 
 def main():
@@ -54,6 +59,16 @@ def main():
     val_data = data[split_idx:]
     logger.info(f"Train data size: {len(train_data)}")
     logger.info(f"Validation data size: {len(val_data)}")
+
+    # Create dataset generator
+    dataset = Dataset(data, split_idx, BLOCK_SIZE, BATCH_SIZE)
+    xb, yb = dataset.get_batch(Split.TRAIN)
+    logger.info("Sample input:")
+    logger.info(f"shape {xb.shape}")
+    logger.info(f"values {xb}")
+    logger.info("Sample target:")
+    logger.info(f"shape {yb.shape}")
+    logger.info(f"values {yb}")
 
 
 if __name__ == "__main__":
