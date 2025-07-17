@@ -42,11 +42,11 @@ def main():
 
     # Create characters <-> integers mappings
     stoi = {ch: i for i, ch in enumerate(chars)}
-    # itos = {i: ch for i, ch in enumerate(chars)}
+    itos = {i: ch for i, ch in enumerate(chars)}
 
     # Define encoding/decoding functions
     encode = lambda s: [stoi[c] for c in s]  # noqa: E731
-    # decode = lambda l: "".join([itos[i] for i in l])
+    decode = lambda l: "".join([itos[i] for i in l])  # noqa: E731, E741
 
     # Encode the text into tensor
     data = torch.tensor(encode(text), dtype=torch.long)
@@ -71,11 +71,35 @@ def main():
     logger.info(f"values {yb}")
 
     # First model: BigramLanguageModel
+    logger.info("Simple BigramLanguageModel...")
     torch.manual_seed(1337)
     bigram_model = BigramLanguageModel(vocab_size)
     logits, loss = bigram_model(xb, yb)
     logger.info(f"Logits shape: {logits.shape}")
     logger.info(f"Loss: {loss.item()}")
+
+    # Generate new tokens
+    seed_token = torch.zeros((1, 1), dtype=torch.long)
+    gen_text = decode(bigram_model.generate(seed_token, max_new_tokens=100)[0].tolist())
+    logger.info("Generated text of untrained model:")
+    logger.info(gen_text)
+
+    optimizer = torch.optim.AdamW(bigram_model.parameters(), lr=1e-3)
+    for step in range(10000):
+        xb, yb = dataset.get_batch(Split.TRAIN)
+        logits, loss = bigram_model(xb, yb)
+        optimizer.zero_grad(set_to_none=True)
+        loss.backward()
+        optimizer.step()
+
+        if step % 100 == 0:
+            logger.info(f"Step {step}, Loss: {loss.item()}")
+
+    # Generate new tokens from trained model
+    seed_token = torch.zeros((1, 1), dtype=torch.long)
+    gen_text = decode(bigram_model.generate(seed_token, max_new_tokens=400)[0].tolist())
+    logger.info("Generated text of trained model:")
+    logger.info(gen_text)
 
 
 if __name__ == "__main__":
