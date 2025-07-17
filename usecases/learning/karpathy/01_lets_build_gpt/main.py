@@ -14,7 +14,7 @@ import logging
 import os
 
 import torch
-from utils import Dataset, Split
+from utils import BigramLanguageModel, Dataset, Split
 
 SHAKESPEARE_INPUT_TEXT: str = "datasets/sample/tinyshakespeare/input.txt"
 TRAIN_DATA_FRACTION: float = 0.9
@@ -69,6 +69,13 @@ def main():
     logger.info("Sample target:")
     logger.info(f"shape {yb.shape}")
     logger.info(f"values {yb}")
+
+    # First model: BigramLanguageModel
+    torch.manual_seed(1337)
+    bigram_model = BigramLanguageModel(vocab_size)
+    logits, loss = bigram_model(xb, yb)
+    logger.info(f"Logits shape: {logits.shape}")
+    logger.info(f"Loss: {loss.item()}")
 
 
 if __name__ == "__main__":
