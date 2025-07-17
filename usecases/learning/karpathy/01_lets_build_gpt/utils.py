@@ -27,11 +27,12 @@ class Split(StrEnum):
 class Dataset:
     """Class to represent a dataset with training and validation splits."""
 
-    def __init__(self, data: torch.Tensor, split_idx: int, block_size: int, batch_size: int):
+    def __init__(self, data: torch.Tensor, split_idx: int, block_size: int, batch_size: int, device: str):
         self.train_data = data[:split_idx]
         self.val_data = data[split_idx:]
         self.block_size = block_size
         self.batch_size = batch_size
+        self.device = device
 
     def get_batch(self, split: Split) -> tuple[torch.Tensor, torch.Tensor]:
         """Get validation data based on the split."""
@@ -39,7 +40,24 @@ class Dataset:
         ix = torch.randint(len(data) - self.block_size, (self.batch_size,))
         x = torch.stack([data[i : i + self.block_size] for i in ix])
         y = torch.stack([data[i + 1 : i + self.block_size + 1] for i in ix])
+        x, y = x.to(self.device), y.to(self.device)
         return x, y
+
+
+@torch.no_grad()
+def estimate_loss(eval_iters: int, model: nn.Module, dataset: Dataset) -> dict[Split, float]:
+    """Estimate the loss on the training and validation datasets."""
+    out = {}
+    for split in [Split.TRAIN, Split.VALIDATION]:
+        model.eval()
+        losses = torch.zeros(eval_iters)
+        for k in range(eval_iters):
+            xb, yb = dataset.get_batch(split)
+            logits, loss = model(xb, yb)
+            losses[k] = loss.item()
+        out[split] = losses.mean().item()
+    model.train()
+    return out
 
 
 class BigramLanguageModel(nn.Module):
@@ -49,7 +67,7 @@ class BigramLanguageModel(nn.Module):
         super().__init__()
         self.token_embedding_table = nn.Embedding(vocab_size, vocab_size)
 
-    def forward(self, idx: torch.Tensor, targets: torch.Tensor | None) -> tuple[torch.Tensor, torch.Tensor | None]:
+    def forward(self, idx: torch.Tensor, targets: torch.Tensor | None = None) -> tuple[torch.Tensor, torch.Tensor | None]:
         """Forward pass of the model."""
         logits = self.token_embedding_table(idx)
 

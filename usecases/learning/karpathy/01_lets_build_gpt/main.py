@@ -14,18 +14,20 @@ import logging
 import os
 
 import torch
-from utils import BigramLanguageModel, Dataset, Split
+from utils import BigramLanguageModel, Dataset, Split, estimate_loss
 
 SHAKESPEARE_INPUT_TEXT: str = "datasets/sample/tinyshakespeare/input.txt"
 TRAIN_DATA_FRACTION: float = 0.9
 BLOCK_SIZE: int = 8
 BATCH_SIZE: int = 4
+EVAL_ITERS: int = 200
 
 # Setup logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
 torch.manual_seed(1337)
+device = "cuda" if torch.cuda.is_available() else "cpu"
 
 
 def main():
@@ -61,7 +63,7 @@ def main():
     logger.info(f"Validation data size: {len(val_data)}")
 
     # Create dataset generator
-    dataset = Dataset(data, split_idx, BLOCK_SIZE, BATCH_SIZE)
+    dataset = Dataset(data, split_idx, BLOCK_SIZE, BATCH_SIZE, device)
     xb, yb = dataset.get_batch(Split.TRAIN)
     logger.info("Sample input:")
     logger.info(f"shape {xb.shape}")
@@ -74,12 +76,13 @@ def main():
     logger.info("Simple BigramLanguageModel...")
     torch.manual_seed(1337)
     bigram_model = BigramLanguageModel(vocab_size)
+    bigram_model.to(device)
     logits, loss = bigram_model(xb, yb)
     logger.info(f"Logits shape: {logits.shape}")
     logger.info(f"Loss: {loss.item()}")
 
     # Generate new tokens
-    seed_token = torch.zeros((1, 1), dtype=torch.long)
+    seed_token = torch.zeros((1, 1), dtype=torch.long, device=device)
     gen_text = decode(bigram_model.generate(seed_token, max_new_tokens=100)[0].tolist())
     logger.info("Generated text of untrained model:")
     logger.info(gen_text)
@@ -92,11 +95,12 @@ def main():
         loss.backward()
         optimizer.step()
 
-        if step % 100 == 0:
-            logger.info(f"Step {step}, Loss: {loss.item()}")
+        if step % EVAL_ITERS == 0:
+            losses = estimate_loss(EVAL_ITERS, bigram_model, dataset)
+            logger.info(f"Step {step}, train loss: {losses[Split.TRAIN]:.4f}, val loss: {losses[Split.VALIDATION]:.4f}")
 
     # Generate new tokens from trained model
-    seed_token = torch.zeros((1, 1), dtype=torch.long)
+    seed_token = torch.zeros((1, 1), dtype=torch.long, device=device)
     gen_text = decode(bigram_model.generate(seed_token, max_new_tokens=400)[0].tolist())
     logger.info("Generated text of trained model:")
     logger.info(gen_text)
