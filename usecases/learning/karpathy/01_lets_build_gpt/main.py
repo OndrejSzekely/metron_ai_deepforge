@@ -14,13 +14,14 @@ import logging
 import os
 
 import torch
-from utils import BigramLanguageModel, Dataset, Split, estimate_loss
+from utils import BigramLanguageModel, BigramLanguageModelBase, Dataset, Split, estimate_loss
 
 SHAKESPEARE_INPUT_TEXT: str = "datasets/sample/tinyshakespeare/input.txt"
 TRAIN_DATA_FRACTION: float = 0.9
 BLOCK_SIZE: int = 8
 BATCH_SIZE: int = 4
 EVAL_ITERS: int = 200
+EMBEDDING_DIM: int = 32
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -72,10 +73,10 @@ def main():
     logger.info(f"shape {yb.shape}")
     logger.info(f"values {yb}")
 
-    # First model: BigramLanguageModel
-    logger.info("Simple BigramLanguageModel...")
+    # First model: BigramLanguageModelBase
+    logger.info("Simple BigramLanguageModelBase...")
     torch.manual_seed(1337)
-    bigram_model = BigramLanguageModel(vocab_size)
+    bigram_model = BigramLanguageModelBase(vocab_size, EMBEDDING_DIM)
     bigram_model.to(device)
     logits, loss = bigram_model(xb, yb)
     logger.info(f"Logits shape: {logits.shape}")
@@ -104,6 +105,23 @@ def main():
     gen_text = decode(bigram_model.generate(seed_token, max_new_tokens=400)[0].tolist())
     logger.info("Generated text of trained model:")
     logger.info(gen_text)
+
+    # Second model: BigramLanguageModel
+    logger.info("Simple BigramLanguageModel...")
+    torch.manual_seed(1337)
+    bigram_model = BigramLanguageModel(vocab_size, EMBEDDING_DIM, BLOCK_SIZE)
+
+    optimizer = torch.optim.AdamW(bigram_model.parameters(), lr=1e-3)
+    for step in range(10000):
+        xb, yb = dataset.get_batch(Split.TRAIN)
+        logits, loss = bigram_model(xb, yb)
+        optimizer.zero_grad(set_to_none=True)
+        loss.backward()
+        optimizer.step()
+
+        if step % EVAL_ITERS == 0:
+            losses = estimate_loss(EVAL_ITERS, bigram_model, dataset)
+            logger.info(f"Step {step}, train loss: {losses[Split.TRAIN]:.4f}, val loss: {losses[Split.VALIDATION]:.4f}")
 
 
 if __name__ == "__main__":
