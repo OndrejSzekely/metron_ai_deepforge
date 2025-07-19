@@ -14,14 +14,17 @@ import logging
 import os
 
 import torch
-from utils import BigramLanguageModel, BigramLanguageModelBase, Dataset, Split, estimate_loss
+from models import BigramLanguageModel, BigramLanguageModelBase, BigramSelfAttentionLanguageModel
+from utils import Dataset, Split, estimate_loss
 
 SHAKESPEARE_INPUT_TEXT: str = "datasets/sample/tinyshakespeare/input.txt"
 TRAIN_DATA_FRACTION: float = 0.9
 BLOCK_SIZE: int = 8
-BATCH_SIZE: int = 4
+BATCH_SIZE: int = 32
+EVAL_INTERVAL: int = 500
 EVAL_ITERS: int = 200
 EMBEDDING_DIM: int = 32
+TRAINING_ITERS: int = 5000
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -76,7 +79,7 @@ def main():
     # First model: BigramLanguageModelBase
     logger.info("Simple BigramLanguageModelBase...")
     torch.manual_seed(1337)
-    bigram_model = BigramLanguageModelBase(vocab_size, EMBEDDING_DIM)
+    bigram_model = BigramLanguageModelBase(vocab_size, EMBEDDING_DIM, device)
     bigram_model.to(device)
     logits, loss = bigram_model(xb, yb)
     logger.info(f"Logits shape: {logits.shape}")
@@ -89,14 +92,14 @@ def main():
     logger.info(gen_text)
 
     optimizer = torch.optim.AdamW(bigram_model.parameters(), lr=1e-3)
-    for step in range(10000):
+    for step in range(TRAINING_ITERS):
         xb, yb = dataset.get_batch(Split.TRAIN)
         logits, loss = bigram_model(xb, yb)
         optimizer.zero_grad(set_to_none=True)
         loss.backward()
         optimizer.step()
 
-        if step % EVAL_ITERS == 0:
+        if step % EVAL_INTERVAL == 0:
             losses = estimate_loss(EVAL_ITERS, bigram_model, dataset)
             logger.info(f"Step {step}, train loss: {losses[Split.TRAIN]:.4f}, val loss: {losses[Split.VALIDATION]:.4f}")
 
@@ -109,17 +112,34 @@ def main():
     # Second model: BigramLanguageModel
     logger.info("Simple BigramLanguageModel...")
     torch.manual_seed(1337)
-    bigram_model = BigramLanguageModel(vocab_size, EMBEDDING_DIM, BLOCK_SIZE)
+    bigram_model = BigramLanguageModel(vocab_size, EMBEDDING_DIM, BLOCK_SIZE, device)
 
     optimizer = torch.optim.AdamW(bigram_model.parameters(), lr=1e-3)
-    for step in range(10000):
+    for step in range(TRAINING_ITERS):
         xb, yb = dataset.get_batch(Split.TRAIN)
         logits, loss = bigram_model(xb, yb)
         optimizer.zero_grad(set_to_none=True)
         loss.backward()
         optimizer.step()
 
-        if step % EVAL_ITERS == 0:
+        if step % EVAL_INTERVAL == 0:
+            losses = estimate_loss(EVAL_ITERS, bigram_model, dataset)
+            logger.info(f"Step {step}, train loss: {losses[Split.TRAIN]:.4f}, val loss: {losses[Split.VALIDATION]:.4f}")
+
+    # Second model: BigramSelfAttentionLanguageModel
+    logger.info("Simple BigramSelfAttentionLanguageModel...")
+    torch.manual_seed(1337)
+    bigram_model = BigramSelfAttentionLanguageModel(vocab_size, EMBEDDING_DIM, BLOCK_SIZE, device)
+
+    optimizer = torch.optim.AdamW(bigram_model.parameters(), lr=1e-3)
+    for step in range(TRAINING_ITERS):
+        xb, yb = dataset.get_batch(Split.TRAIN)
+        logits, loss = bigram_model(xb, yb)
+        optimizer.zero_grad(set_to_none=True)
+        loss.backward()
+        optimizer.step()
+
+        if step % EVAL_INTERVAL == 0:
             losses = estimate_loss(EVAL_ITERS, bigram_model, dataset)
             logger.info(f"Step {step}, train loss: {losses[Split.TRAIN]:.4f}, val loss: {losses[Split.VALIDATION]:.4f}")
 

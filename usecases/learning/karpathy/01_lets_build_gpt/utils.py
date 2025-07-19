@@ -14,7 +14,6 @@ from enum import StrEnum
 
 import torch
 from torch import nn
-from torch.nn import functional as F
 
 
 class Split(StrEnum):
@@ -58,83 +57,3 @@ def estimate_loss(eval_iters: int, model: nn.Module, dataset: Dataset) -> dict[S
         out[split] = losses.mean().item()
     model.train()
     return out
-
-
-class BigramLanguageModelBase(nn.Module):
-    """A simple bigram language model."""
-
-    def __init__(self, vocab_size: int, embedding_dim: int):
-        super().__init__()
-        self.token_embedding_table = nn.Embedding(vocab_size, embedding_dim)
-        self.lm_head = nn.Linear(embedding_dim, vocab_size)
-
-    def forward(self, idx: torch.Tensor, targets: torch.Tensor | None = None) -> tuple[torch.Tensor, torch.Tensor | None]:
-        """Forward pass of the model."""
-
-        tok_embd = self.token_embedding_table(idx)
-        logits = self.lm_head(tok_embd)
-
-        if targets is None:
-            return logits, None
-        B, T, C = logits.shape
-        logits = logits.view(B * T, C)
-        targets = targets.view(B * T)
-        loss = F.cross_entropy(logits, targets)
-
-        return logits, loss
-
-    def generate(self, idx: torch.Tensor, max_new_tokens: int) -> torch.Tensor:
-        """Generate new tokens from the model."""
-        # idx is (B, T) tensor of indices in the current context
-        for _ in range(max_new_tokens):
-            # get the predictions
-            logits, _ = self(idx)
-            # focus on the last time step
-            logits = logits[:, -1, :]  # becomes (B, C)
-            probs = F.softmax(logits, dim=-1)  # (B, C)
-            # sample from the distribution
-            idx_next = torch.multinomial(probs, num_samples=1)  # (B, 1)
-            idx = torch.cat((idx, idx_next), dim=1)  # (B, T+1)
-        return idx
-
-
-class BigramLanguageModel(nn.Module):
-    """A simple bigram language model."""
-
-    def __init__(self, vocab_size: int, embedding_dim: int, block_size: int):
-        super().__init__()
-        self.token_embedding_table = nn.Embedding(vocab_size, embedding_dim)
-        self.position_embedding_table = nn.Embedding(block_size, embedding_dim)
-        self.lm_head = nn.Linear(embedding_dim, vocab_size)
-
-    def forward(self, idx: torch.Tensor, targets: torch.Tensor | None = None) -> tuple[torch.Tensor, torch.Tensor | None]:
-        """Forward pass of the model."""
-        B, T = idx.shape
-
-        tok_embd = self.token_embedding_table(idx)
-        pos_embd = self.position_embedding_table(torch.arange(T, device=idx.device))
-        x = tok_embd + pos_embd
-        logits = self.lm_head(x)
-
-        if targets is None:
-            return logits, None
-        B, T, C = logits.shape
-        logits = logits.view(B * T, C)
-        targets = targets.view(B * T)
-        loss = F.cross_entropy(logits, targets)
-
-        return logits, loss
-
-    def generate(self, idx: torch.Tensor, max_new_tokens: int) -> torch.Tensor:
-        """Generate new tokens from the model."""
-        # idx is (B, T) tensor of indices in the current context
-        for _ in range(max_new_tokens):
-            # get the predictions
-            logits, _ = self(idx)
-            # focus on the last time step
-            logits = logits[:, -1, :]  # becomes (B, C)
-            probs = F.softmax(logits, dim=-1)  # (B, C)
-            # sample from the distribution
-            idx_next = torch.multinomial(probs, num_samples=1)  # (B, 1)
-            idx = torch.cat((idx, idx_next), dim=1)  # (B, T+1)
-        return idx
