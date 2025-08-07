@@ -23,7 +23,7 @@ Metron AI DeepForge is AI/Deep Learning framework.
 - [Documentation](#documentation)
 
 ## Status
-[![License: GPL v3](https://img.shields.io/github/license/ondrejszekely/metron_ai_deepforge)](https://www.gnu.org/licenses/gpl-3.0) [![Last commit](https://img.shields.io/github/last-commit/ondrejszekely/metron_ai_deepforge/main)](https://github.com/OndrejSzekely/metron_ai_deepforge/main)
+[![License: MIT](https://img.shields.io/github/license/ondrejszekely/metron_ai_deepforge)](https://opensource.org/licenses/MIT) [![Last commit](https://img.shields.io/github/last-commit/ondrejszekely/metron_ai_deepforge/main)](https://github.com/OndrejSzekely/metron_ai_deepforge/main)
 
 ## Documentation
 Online documentation of the latest commit on the *main* branch can be found [here](https://ondrejszekely.github.io/metron_ai_deepforge).
