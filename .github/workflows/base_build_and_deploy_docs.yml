@@ -1,0 +1,62 @@
+name: Build & deploy documentation
+on:
+  workflow_call:
+    inputs:
+      deploy_docs:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-docs-src-change:
+    runs-on: ubuntu-latest
+    outputs:
+      docs_src_change: ${{ steps.check_docs_src_change.outputs.docs_src }}
+    steps:
+      - name: Checkout DeepForge repo
+        uses: actions/checkout@v4
+      - name: Check docs src change
+        id: check_docs_src_change
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            docs_src:
+              - 'docs_src/**'
+  call-build-docs:
+    needs: check-docs-src-change
+    uses: OndrejSzekely/metron_ai_deepforge/.github/workflows/set_up_deepforge_cpu_env_and_run_base.yml@main
+    with:
+      if: ${{ needs.check-docs-src-change.outputs.docs_src_change == 'true' }}
+      run_commands: uv run sphinx-build -b html docs_src docs
+      upload_name: built_docs
+      upload_path: docs
+  deploy-docs:
+    if: ${{ inputs.deploy_docs == 'true' }}
+    needs: call-build-docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download built docs
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ needs.build-docs.outputs.upload_id }}
+      - name: Upload docs to GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: built_docs
+          retention-days: 1
+      - name: Deploy GitHub Pages
+        uses: actions/deploy-pages@v4
+
+  skip-workflow:
+    needs: check-docs-src-change
+    if: ${{ needs.check-docs-src-change.outputs.docs_src_change == 'false' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skipping Action
+        run: echo "Action is skipped"

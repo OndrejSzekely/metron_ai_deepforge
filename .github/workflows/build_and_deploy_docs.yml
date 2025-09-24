@@ -1,6 +1,6 @@
-name: Call documentation build
+name: Call documentation build & deploy
 on:
-  pull_request:
+  push:
     branches: ["main"]
 
   # Allows you to run this workflow manually from the Actions tab
@@ -8,13 +8,15 @@ on:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}
   cancel-in-progress: true
 
 jobs:
-  call-docs-build:
+  call-docs-build-and-deploy:
     uses: OndrejSzekely/metron_ai_deepforge/.github/workflows/base_build_and_deploy_docs.yml@main
     with:
-      deploy_docs: false
+      deploy_docs: true
