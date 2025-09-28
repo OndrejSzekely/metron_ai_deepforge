@@ -72,3 +72,11 @@ repos:
         language: system
         entry: bash -c 'sphinx-build -b html docs_src docs || true'
         files: ^docs_src
+-   repo: local
+    hooks:
+    -   id: unit-tests
+        name: run unit tests
+        language: system
+        entry: uv run pytest -m unit || true'
+        files: \.py$
+        exclude: ^usecases
