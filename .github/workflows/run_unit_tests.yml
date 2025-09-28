@@ -1,0 +1,45 @@
+name: Run unit tests
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-py-src-change:
+    runs-on: ubuntu-latest
+    outputs:
+      py_src_change: ${{ steps.check_py_src_change.outputs.python_src }}
+    steps:
+      - name: Checkout DeepForge repo
+        uses: actions/checkout@v4
+      - name: Check .py src change
+        id: check_py_src_change
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            python_src:
+              - '**/*.py'
+  call-run-unit-tests:
+    needs: check-py-src-change
+    uses: OndrejSzekely/metron_ai_deepforge/.github/workflows/set_up_deepforge_cpu_env_and_run_base.yml@main
+    with:
+      if: ${{ needs.check-py-src-change.outputs.py_src_change == 'true' }}
+      run_commands: uv run pytest -m unit
+  skip-workflow:
+    needs: check-py-src-change
+    if: ${{ needs.check-py-src-change.outputs.py_src_change == 'false' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skipping Action
+        run: echo "Action is skipped"
