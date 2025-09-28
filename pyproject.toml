@@ -10,9 +10,6 @@ python-preference = "only-system"
 line-length = 150
 include = ["*.py"]
 
-[tool.pytest.ini_options]
-pythonpath = "."
-
 [project.optional-dependencies]
 docs = [
     "myst-parser==1.0.0",
@@ -32,4 +29,14 @@ devtools = [
     "pyright>=1.1.402",
     "pytest>=8.4.0",
     "ruff>=0.11.12",
+]
+
+[tool.pytest.ini_options]
+pythonpath = "."
+console_output_style = "count"
+empty_parameter_set_mark = "xfail"
+testpaths = ["tests"]
+markers = [
+    "unit: marks tests as unit tests",
+    "integration: marks tests as integration tests",
 ]
