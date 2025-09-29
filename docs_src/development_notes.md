@@ -8,7 +8,7 @@ The project is designed fot *Visual Studio Code* development environment.
 
 2. Press *Ctrl + Shift + P* and search for *Dev Containers: Open Folder in Container...* and click on it.
 
-3. Select dev env, either PyTorch or Tensorflow.
+3. Select dev env, either PyTorch.
 
 ## Programming Principles
 
