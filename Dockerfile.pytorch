@@ -25,7 +25,7 @@ WORKDIR $workdir_path
 
 # uv sync will use `uv.lock` if available
 COPY uv.lock pyproject.toml ./
-RUN sudo uv sync --group devtools --all-extras --inexact && rm pyproject.toml uv.lock
+RUN sudo uv sync --group devtools --group core --all-extras --inexact && rm pyproject.toml uv.lock
 
 WORKDIR /
 
