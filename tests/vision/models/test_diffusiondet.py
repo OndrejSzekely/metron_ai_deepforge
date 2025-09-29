@@ -6,7 +6,7 @@
 import pytest
 
 import metron_shared.param_validators as param_val
-from forge.models.diffusiondet import DiffusionDet
+from forge.vision.models.diffusiondet import DiffusionDet
 
 
 @pytest.mark.unit
