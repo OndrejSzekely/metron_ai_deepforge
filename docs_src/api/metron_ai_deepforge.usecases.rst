@@ -10,6 +10,5 @@ metron\_ai\_deepforge.usecases package
 Subpackages
 -----------
 .. autosummary::
-   metron_ai_deepforge.usecases.asterisk
    metron_ai_deepforge.usecases.learning
 
