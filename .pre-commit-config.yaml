@@ -77,6 +77,6 @@ repos:
     -   id: unit-tests
         name: run unit tests
         language: system
-        entry: uv run pytest -m unit || true'
+        entry: bash -c 'uv run pytest -m unit || true'
         files: \.py$
         exclude: ^usecases
