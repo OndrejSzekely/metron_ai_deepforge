@@ -6,3 +6,9 @@ metron\_ai\_deepforge.forge package
    :undoc-members:
    :show-inheritance:
    :private-members:
+
+Subpackages
+-----------
+.. autosummary::
+   metron_ai_deepforge.forge.vision
+
