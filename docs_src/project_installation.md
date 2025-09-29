@@ -27,7 +27,6 @@ Follow the instruction steps.
     ```
 
     It will build following docker images:
-        - `metron_ai/deepforge_pt`: *TensorFlow* based Docker image.
         - `metron_ai/deepforge_tf`: *PyTorch* based Docker image.
   
 4. Then run a container using following command:

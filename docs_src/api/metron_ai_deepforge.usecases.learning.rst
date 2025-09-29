@@ -6,3 +6,9 @@ metron\_ai\_deepforge.usecases.learning package
    :undoc-members:
    :show-inheritance:
    :private-members:
+
+Subpackages
+-----------
+.. autosummary::
+   metron_ai_deepforge.usecases.learning.karpathy
+

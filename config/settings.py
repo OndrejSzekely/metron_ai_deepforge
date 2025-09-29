@@ -1,6 +1,6 @@
-# This file is part of the Metron AI ArDaGen (https://github.com/OndrejSzekely/metron_ai_ardagen).
-# Copyright (c) 2025 Ondrej Szekely.
-#
+# This file is part of the Metron AI DeepForge (https://github.com/OndrejSzekely/metron_ai_deepforge).
+# Copyright (c) 2025 Ondrej Szekely (ondra.szekely@gmail.com).
+
 # This program is free software: you can redistribute it and/or modify it under the terms of the
 # GNU General Public License as published by the Free Software Foundation, version 3. This program
 # is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
@@ -10,20 +10,11 @@
 
 """Module containing DeepForge environment settings."""
 
-import os
 from dataclasses import dataclass
-from enum import StrEnum
-
-
-class AIBackend(StrEnum):
-    """Enum for AI backend options."""
-
-    PYTORCH = "pytorch"
-    TENSORFLOW = "tensorflow"
 
 
 @dataclass
 class DeepForgeSettings:
     """Settings for the DeepForge environment."""
 
-    ai_backend: str = os.environ["AI_BACKEND"]
+    ...
