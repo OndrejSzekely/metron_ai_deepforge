@@ -48,7 +48,7 @@ jobs:
         - name: Install PyTorch for CPU
           run: uv pip install --requirements .github/pytorch_cpu_runner_requirements.txt
         - name: Install project dependencies
-          run: uv sync --group devtools --all-extras --inexact --frozen
+          run: uv sync --group devtools --group core --all-extras --inexact --frozen
         - name: Minimize uv cache
           run: uv cache prune --ci
         - name: Execute custom commands
