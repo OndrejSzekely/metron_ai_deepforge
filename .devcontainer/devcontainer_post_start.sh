@@ -6,6 +6,9 @@ sudo uv sync --group devtools --group core --all-extras --inexact
 # Install pre-commit hooks
 sudo pre-commit install
 
+# Install Metron Shared submodule
+pip install -e metron_shared
+
 # Load all secret enviromental variables
 SECRET_ENV_DIR="./.devcontainer/secrets"
 BASHRC="$HOME/.bashrc"
