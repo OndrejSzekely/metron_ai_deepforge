@@ -18,6 +18,5 @@ Submodules
 
 
 .. autosummary::
-   metron_ai_deepforge.metron_shared.io_utils
    metron_ai_deepforge.metron_shared.param_validators
    metron_ai_deepforge.metron_shared.structures
