@@ -1,5 +1,7 @@
 #!/bin/bash
 
+BASHRC="$HOME/.bashrc"
+
 # Install dependencies
 sudo uv sync --group devtools --group core --all-extras --inexact
 
@@ -9,9 +11,11 @@ sudo pre-commit install
 # Install Metron Shared submodule
 pip install -e metron_shared
 
+# Add Metron AI DeepForge folder into Python PATH
+echo "export PYTHONPATH=$(pwd):$PYTHONPATH" >> "$BASHRC"
+
 # Load all secret enviromental variables
 SECRET_ENV_DIR="./.devcontainer/secrets"
-BASHRC="$HOME/.bashrc"
 
 if [ ! -d "$SECRET_ENV_DIR" ]; then
   echo "Secrets directory not found: $SECRET_ENV_DIR"
