@@ -14,4 +14,5 @@ Subpackages
    metron_ai_deepforge.forge
    metron_ai_deepforge.metron_shared
    metron_ai_deepforge.usecases
+   metron_ai_deepforge.utils
 
