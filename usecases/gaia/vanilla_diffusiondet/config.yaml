@@ -1,0 +1,4 @@
+defaults:
+  - vision/encoders: ResNet50
+
+foo: 555
