@@ -6,5 +6,5 @@
 from torch import nn
 
 
-class ResNetEncoder(nn.Module):
+class ResNet50(nn.Module):
     """ResNet Encoder for Vision Tasks."""

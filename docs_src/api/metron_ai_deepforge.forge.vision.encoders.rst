@@ -12,4 +12,4 @@ Submodules
 
 
 .. autosummary::
-   metron_ai_deepforge.forge.vision.encoders.resnet_enc
+   metron_ai_deepforge.forge.vision.encoders.resnet50

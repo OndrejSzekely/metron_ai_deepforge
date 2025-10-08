@@ -7,6 +7,7 @@
 ├── forge # Contains custom reusable building blocks.
 ├── hydra_plugin # Stores Hydra plugins, for instance plugin for multiple config search paths.
 ├── tests # Tests implementation folder.
+├── utils # DeepForge utilities.
 ```
 
 ## New Use Case Skeleton

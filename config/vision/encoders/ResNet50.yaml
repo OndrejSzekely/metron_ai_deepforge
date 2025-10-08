@@ -1,0 +1,5 @@
+defaults:
+  - /vision/encoders_lib/resnet50@_here_
+  - _self_
+
+_target_: forge.vision.encoders.resnet50.ResNet50
