@@ -7,8 +7,10 @@ import hydra
 from omegaconf import DictConfig
 
 from metron_shared.config.config import set_hydra_config
+from utils.runtime import register_all_config_schema_libs
 
 
+@register_all_config_schema_libs
 @hydra.main(version_base="1.3", config_path=".", config_name="config")
 @set_hydra_config
 def main(cfg: DictConfig) -> None: ...

@@ -17,3 +17,4 @@ class DeepForgeSearchPathPlugin(SearchPathPlugin):
             search_path (ConfigSearchPath): The current configuration search path.
         """
         search_path.append(provider="deepforge-searchpath-plugin", path="pkg://config_schema")
+        search_path.append(provider="deepforge-searchpath-plugin", path="pkg://config")
