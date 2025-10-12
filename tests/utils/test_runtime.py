@@ -6,7 +6,9 @@
 import importlib
 import os
 
+import omegaconf
 import pytest
+from hydra.core.config_store import ConfigStore
 
 from utils.runtime import register_all_config_schema_libs
 
@@ -57,3 +59,42 @@ def test_register_all_config_schema_libs_decorator():
         dummy_main()
     except AttributeError as e:
         pytest.fail(f"Decorator <register_all_config_schema_libs> raised an unexpected AttributeError: {e}")
+
+
+@pytest.mark.unit
+def test_having_valid_target_for_registered_configs():
+    """Test that all registered Structured Config Schemas have a valid <_target_> attribute pointing
+    to an existing class."""
+
+    # GIVEN: A generator of all registered Structured Config Schemas in Hydra's ConfigStore <all_registered_configs>
+    @register_all_config_schema_libs
+    def dummy_main():
+        return True
+
+    dummy_main()
+    deepforge_nodes = ConfigStore.instance().repo["deepforge"]
+
+    def _extract_nodes(d):
+        if not isinstance(d, dict):
+            yield d
+        else:
+            for v in d.values():
+                yield from _extract_nodes(v)
+
+    all_registered_configs = _extract_nodes(deepforge_nodes)
+
+    # WHEN: Checking all registered Structured Config Schema nodes for valid <_target_> attribute
+    for node in all_registered_configs:
+        try:
+            target_path = node.node["_target_"]
+            module, class_name = target_path.rsplit(".", 1)
+            module = importlib.import_module(module)
+            getattr(module, class_name)
+
+        # THEN: All registered Structured Config Schema nodes have a valid <_target_> attribute
+        except omegaconf.errors.MissingMandatoryValue:
+            pytest.fail(f"Registered config '{node.name}' in group '{node.group}' is missing mandatory <_target_> attribute.")
+        except ImportError:
+            pytest.fail(f"Registered config '{node.name}' in group '{node.group}' has an invalid <_target_> module path: '{module}'.")  # type: ignore[reportPossiblyUnboundVariable]
+        except AttributeError:
+            pytest.fail(f"Registered config '{node.name}' in group '{node.group}' has an invalid <_target_> class name: '{class_name}'.")  # type: ignore[reportPossiblyUnboundVariable]
