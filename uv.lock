@@ -244,6 +244,9 @@ wheels = [
 name = "metron-ai-deepforge"
 version = "0.1"
 source = { virtual = "." }
+dependencies = [
+    { name = "metron-shared" },
+]
 
 [package.optional-dependencies]
 docs = [
@@ -271,6 +274,7 @@ devtools = [
 
 [package.metadata]
 requires-dist = [
+    { name = "metron-shared", editable = "metron_shared" },
     { name = "myst-parser", marker = "extra == 'docs'", specifier = "==1.0.0" },
     { name = "sphinx", marker = "extra == 'docs'", specifier = "~=5.2" },
     { name = "sphinx-book-theme", marker = "extra == 'docs'", specifier = "==1.1.0" },
@@ -290,6 +294,21 @@ devtools = [
     { name = "pyright", specifier = ">=1.1.402" },
     { name = "pytest", specifier = ">=8.4.0" },
     { name = "ruff", specifier = ">=0.11.12" },
+]
+
+[[package]]
+name = "metron-shared"
+version = "0.1"
+source = { editable = "metron_shared" }
+dependencies = [
+    { name = "hydra-core" },
+    { name = "typeguard" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "hydra-core", specifier = ">=1.3.0" },
+    { name = "typeguard", specifier = ">=4.3.0" },
 ]
 
 [[package]]
@@ -677,6 +696,18 @@ dependencies = [
     { name = "sphinx" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/5e/d4/03eeedb6346625ec40bd4ab16f3d4971f4f3db6f635dc8b2d0ad605368eb/sphinxemoji-0.2.0.tar.gz", hash = "sha256:27861d1dd7c6570f5e63020dac9a687263f7481f6d5d6409eb31ecebcc804e4c", size = 44431, upload-time = "2021-10-06T11:55:37.672Z" }
+
+[[package]]
+name = "typeguard"
+version = "4.4.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c7/68/71c1a15b5f65f40e91b65da23b8224dad41349894535a97f63a52e462196/typeguard-4.4.4.tar.gz", hash = "sha256:3a7fd2dffb705d4d0efaed4306a704c89b9dee850b688f060a8b1615a79e5f74", size = 75203, upload-time = "2025-06-18T09:56:07.624Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1b/a9/e3aee762739c1d7528da1c3e06d518503f8b6c439c35549b53735ba52ead/typeguard-4.4.4-py3-none-any.whl", hash = "sha256:b5f562281b6bfa1f5492470464730ef001646128b180769880468bd84b68b09e", size = 34874, upload-time = "2025-06-18T09:56:05.999Z" },
+]
 
 [[package]]
 name = "typing-extensions"
