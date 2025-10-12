@@ -65,11 +65,12 @@ Software component's parameters are configured using [Hydra](https://hydra.cc/) 
 #### Internal *Config Groups*
 
 ```shell
-├── vision
-    ├── encoders_lib
-        ├── resnet50
-    ├── models_lib
-        ├── diffusiondet
+├── deepforge
+    ├── vision
+        ├── encoders_lib
+            ├── resnet50
+        ├── models_lib
+            ├── diffusiondet
 ```
 
 #### Enduser Facing *Config Groups*

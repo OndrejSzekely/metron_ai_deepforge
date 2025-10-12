@@ -28,8 +28,8 @@ def register_lib() -> None:
 
     cs = ConfigStore.instance()
     cs.store(
-        group="vision/encoders_lib",
+        group="deepforge/vision/encoders_lib",
         name="resnet50",
         node=ResNet50Config,
-        package="vision.encoders_lib",
+        package="deepforge.vision.encoders_lib",
     )

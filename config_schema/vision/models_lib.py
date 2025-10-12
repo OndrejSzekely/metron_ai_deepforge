@@ -28,8 +28,8 @@ def register_lib() -> None:
 
     cs = ConfigStore.instance()
     cs.store(
-        group="vision/models_lib",
+        group="deepforge/vision/models_lib",
         name="diffusiondet",
         node=DiffusionDetConfig,
-        package="vision.models_lib",
+        package="deepforge.vision.models_lib",
     )
