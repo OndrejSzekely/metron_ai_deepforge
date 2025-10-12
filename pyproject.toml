@@ -38,7 +38,7 @@ core = [
 ]
 
 [tool.uv.sources]
-metron_shared = { path = "./metron_shared", editable = true }
+metron_shared = { path = "./metron_shared", editable = false }
 
 [tool.pytest.ini_options]
 pythonpath = "."
