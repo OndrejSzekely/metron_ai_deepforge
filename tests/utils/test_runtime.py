@@ -17,7 +17,7 @@ def test_check_register_lib_func_exists():
     in <config_schema> package."""
 
     # GIVEN: A list of all Config Schema modules <config_schema_modules_list> in <config_schema> package
-    config_schema_package_name = "config_schema"
+    config_schema_package_name = os.environ["DEEPFORGE_STRUCTURED_CONFIG_SCHEMAS_PACKAGE"]
     config_schema_modules_list = []
     config_schema_package = importlib.import_module(config_schema_package_name)
     config_schema_package_path = config_schema_package.__path__[0]

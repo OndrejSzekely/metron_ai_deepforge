@@ -3,6 +3,7 @@
 
 """Runtime utilities for DeepForge."""
 
+import os
 import pkgutil
 from functools import wraps
 from typing import Any, Callable
@@ -37,8 +38,8 @@ def register_all_config_schema_libs(main_function: Callable[..., Any]) -> Callab
         """
 
         for module_info in pkgutil.walk_packages(
-            path=["./config_schema"],
-            prefix="config_schema.",
+            path=[f"./{os.environ['DEEPFORGE_STRUCTURED_CONFIG_SCHEMAS_PACKAGE']}"],
+            prefix=f"{os.environ['DEEPFORGE_STRUCTURED_CONFIG_SCHEMAS_PACKAGE']}.",
         ):
             if not module_info.ispkg:
                 lib = __import__(module_info.name, fromlist=["register_lib"])
