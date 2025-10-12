@@ -17,6 +17,7 @@ Metron AI DeepForge is AI/Deep Learning framework.
 
 :boom: multi-framework support
 :boom: Devcontainer dev environment
+:boom: Configuration using Meta's Hydra framework
 
 ## Table of Contents <!-- omit in toc -->
 - [Status](#status)
