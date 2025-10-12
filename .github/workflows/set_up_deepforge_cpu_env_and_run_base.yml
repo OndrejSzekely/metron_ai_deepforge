@@ -54,7 +54,7 @@ jobs:
         - name: Load container env variables
           run: set -a && source .env.container && set +a
         - name: Install Metron Shared
-          run: pip install -e metron_shared
+          run: git submodule update --init --recursive && pip install -e metron_shared
         - name: Execute custom commands
           if: ${{ inputs.run_commands != '' }}
           run: ${{ inputs.run_commands }}
