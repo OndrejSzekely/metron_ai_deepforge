@@ -2,14 +2,14 @@
 
 BASHRC="$HOME/.bashrc"
 
+# Initialize Metron Shared submodule
+git submodule update --init --recursive
+
 # Install dependencies
 sudo uv sync --group devtools --group core --all-extras --inexact
 
 # Install pre-commit hooks
 sudo pre-commit install
-
-# Install Metron Shared submodule
-uv run pip install -e metron_shared
 
 # Add Metron AI DeepForge folder into Python PATH
 echo "export PYTHONPATH=$(pwd):$PYTHONPATH" >> "$BASHRC"

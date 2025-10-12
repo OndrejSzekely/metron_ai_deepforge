@@ -2,6 +2,9 @@
 name = "metron_ai_deepforge"
 requires-python = ">=3.12,<3.13"
 version = "0.1"
+dependencies = [
+    "metron_shared"
+]
 
 [tool.uv]
 python-preference = "only-system"
@@ -31,8 +34,11 @@ devtools = [
     "ruff>=0.11.12",
 ]
 core = [
-    "hydra-core==1.3.0",
+    "hydra-core==1.3.0"
 ]
+
+[tool.uv.sources]
+metron_shared = { path = "./metron_shared", editable = true }
 
 [tool.pytest.ini_options]
 pythonpath = "."
