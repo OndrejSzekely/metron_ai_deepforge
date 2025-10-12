@@ -9,7 +9,7 @@ sudo uv sync --group devtools --group core --all-extras --inexact
 sudo pre-commit install
 
 # Install Metron Shared submodule
-pip install -e metron_shared
+uv run pip install -e metron_shared
 
 # Add Metron AI DeepForge folder into Python PATH
 echo "export PYTHONPATH=$(pwd):$PYTHONPATH" >> "$BASHRC"
