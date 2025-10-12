@@ -51,6 +51,8 @@ jobs:
           run: uv sync --group devtools --group core --all-extras --inexact --frozen
         - name: Minimize uv cache
           run: uv cache prune --ci
+        - name: Load container env variables
+          run: set -a && source .env.container && set +a
         - name: Execute custom commands
           if: ${{ inputs.run_commands != '' }}
           run: ${{ inputs.run_commands }}
