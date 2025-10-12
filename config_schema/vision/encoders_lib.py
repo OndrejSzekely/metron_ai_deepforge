@@ -20,7 +20,7 @@ class VisionEncoderBaseConfig:
 class ResNet50Config(VisionEncoderBaseConfig):
     """Configuration for ResNet-50 encoder."""
 
-    ...
+    _target_: str = "forge.vision.encoders.resnet50.ResNet50"
 
 
 def register_lib() -> None:

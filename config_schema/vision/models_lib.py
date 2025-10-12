@@ -20,7 +20,7 @@ class VisionModelBaseConfig:
 class DiffusionDetConfig(VisionModelBaseConfig):
     """Configuration for DiffusionDet model."""
 
-    ...
+    _target_: str = "forge.vision.models.diffusiondet.DiffusionDet"
 
 
 def register_lib() -> None:
