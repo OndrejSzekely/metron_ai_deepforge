@@ -38,6 +38,8 @@ jobs:
     steps:
         - name: Checkout DeepForge repo
           uses: actions/checkout@v4
+        - name: Initialize Metron Shared submodule
+          run: git submodule update --init --recursive
         - name: Install uv
           uses: astral-sh/setup-uv@v5
           with:
@@ -53,8 +55,6 @@ jobs:
           run: uv cache prune --ci
         - name: Load container env variables
           run: set -a && source .env.container && set +a
-        - name: Install Metron Shared
-          run: git submodule update --init --recursive && uv run pip install -e metron_shared
         - name: Execute custom commands
           if: ${{ inputs.run_commands != '' }}
           run: ${{ inputs.run_commands }}
