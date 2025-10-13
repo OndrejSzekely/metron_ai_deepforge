@@ -14,6 +14,8 @@
         "stack=67108864",
         "--env-file",
         ".env.container",
+        "--env-file",
+        ".env.deepforge",
         "--volume",
         "${env:METRON_AI_CATALOGUE_HOST_PATH}:/mnt/catalogue"
     ],

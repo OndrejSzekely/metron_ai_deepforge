@@ -53,8 +53,11 @@ jobs:
           run: uv sync --group devtools --group core --all-extras --inexact --frozen --refresh
         - name: Minimize uv cache
           run: uv cache prune --ci
-        - name: Load container env variables
-          run: cat .env.container >> $GITHUB_ENV
+        - name: Load DeepForge env variables
+          run: |
+            grep -v '^#' .env.deepforge | grep -v '^$' | while read line; do
+              echo "$line" >> $GITHUB_ENV
+            done
         - name: Execute custom commands
           if: ${{ inputs.run_commands != '' }}
           run: ${{ inputs.run_commands }}
