@@ -35,7 +35,8 @@ done
 # create a container and run `container_entry`` script
 # required to run with `-t` switch for later interactive mode execution! 
 container_id=$(docker run --rm -t --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 \
-  --env-file .env.container ${mounted_volumes} -v $(pwd):/metron_ai_deepforge_repo \
+  --env-file .env.container ${mounted_volumes} -env-file .env.deepforge ${mounted_volumes} \
+  -v $(pwd):/metron_ai_deepforge_repo \
   --user "$(id -u):$(id -g)" \
   --volume "${HOME}:/${HOME}:ro" \
   --name metron_ai_deepforge_${arg_backend} \
