@@ -12,4 +12,4 @@ This chapter describes CI/CD workflows architecture.
 
 ### Overview of CI/CD Azure Workflows Architecture
 
-![Deployed GitHub Action Workflows Architecture](../imgs/azure_workflows_architecture.png)
+![Deployed GitHub Action Workflows Architecture](../imgs/azure_workflows_architecture.jpg)
