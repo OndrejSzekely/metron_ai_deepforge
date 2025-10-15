@@ -274,7 +274,7 @@ devtools = [
 
 [package.metadata]
 requires-dist = [
-    { name = "metron-shared", editable = "metron_shared" },
+    { name = "metron-shared", directory = "metron_shared" },
     { name = "myst-parser", marker = "extra == 'docs'", specifier = "==1.0.0" },
     { name = "sphinx", marker = "extra == 'docs'", specifier = "~=5.2" },
     { name = "sphinx-book-theme", marker = "extra == 'docs'", specifier = "==1.1.0" },
@@ -299,7 +299,7 @@ devtools = [
 [[package]]
 name = "metron-shared"
 version = "0.1"
-source = { editable = "metron_shared" }
+source = { directory = "metron_shared" }
 dependencies = [
     { name = "hydra-core" },
     { name = "typeguard" },
