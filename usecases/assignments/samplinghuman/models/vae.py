@@ -40,8 +40,9 @@ class VAEEncoder(nn.Module):
     - Linear 256 -> 256 + ReLU => 256
     """
 
-    def __init__(self):
+    def __init__(self, embedding_dim: int):
         super().__init__()
+        self.embedding_dim = embedding_dim
         self.conv_block1 = conv_block(in_channels=3, out_channels=64, kernel_size=3, stride=1, padding="same")
         self.conv_block2 = conv_block(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding="same")
         self.conv_block3 = conv_block(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding="same")
@@ -52,7 +53,7 @@ class VAEEncoder(nn.Module):
         self.conv_block8 = conv_block(in_channels=256, out_channels=256, kernel_size=3, stride=1, padding="same")
         self.fc1 = nn.Linear(256, 256)
         self.point_conv1 = nn.Conv2d(64, 128, kernel_size=1, stride=1, padding=0)
-        self.point_conv2 = nn.Conv2d(128, 256, kernel_size=1, stride=1, padding=0)
+        self.point_conv2 = nn.Conv2d(128, self.embedding_dim, kernel_size=1, stride=1, padding=0)
 
     def forward(self, x):
         """_summary_
@@ -121,9 +122,10 @@ class VAEDecoder(nn.Module):
     - Conv2D 3x3, stride 1, padding 1, out_channels 3 + Sigmoid => 16x16x3
     """
 
-    def __init__(self):
+    def __init__(self, embedding_dim: int):
         super().__init__()
-        self.deconv_block1 = deconv_block(in_channels=256, out_channels=256, kernel_size=2, stride=1, padding=0, output_padding=0)
+        self.embedding_dim = embedding_dim
+        self.deconv_block1 = deconv_block(in_channels=self.embedding_dim, out_channels=256, kernel_size=2, stride=1, padding=0, output_padding=0)
         self.conv_block1 = conv_block(in_channels=256, out_channels=256, kernel_size=3, stride=1, padding="same")
         self.deconv_block2 = deconv_block(in_channels=256, out_channels=256, kernel_size=3, stride=1, padding=0, output_padding=0)
         self.conv_block2 = conv_block(in_channels=256, out_channels=128, kernel_size=3, stride=1, padding="same")
@@ -161,3 +163,23 @@ class VAEDecoder(nn.Module):
         x = F.sigmoid(x)
 
         return x
+
+
+class VAE(nn.Module):
+    """Variational Autoencoder combining VAEEncoder and VAEDecoder."""
+
+    def __init__(self, embedding_dim: int):
+        super().__init__()
+        self.embedding_dim = embedding_dim
+        self.encoder = VAEEncoder(embedding_dim)
+        self.decoder = VAEDecoder(embedding_dim)
+
+    def forward(self, x):
+        """_summary_
+
+        Args:
+            x (torch.Tensor): Tensor of shape (B, C, H, W)
+        """
+        latent = self.encoder(x)
+        reconstructed = self.decoder(latent)
+        return reconstructed
