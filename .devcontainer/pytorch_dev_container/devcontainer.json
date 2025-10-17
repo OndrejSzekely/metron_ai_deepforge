@@ -17,7 +17,9 @@
         "--env-file",
         ".env.deepforge",
         "--volume",
-        "${env:METRON_AI_CATALOGUE_HOST_PATH}:/mnt/catalogue"
+        "${env:METRON_AI_CATALOGUE_HOST_PATH}:/mnt/catalogue",
+        "--volume",
+        "/home/ondra/Downloads/case_study_v2/to_share/data:/mnt/samplinghuman_data"
     ],
     "postStartCommand": "./.devcontainer/devcontainer_post_start.sh",
     "customizations": {
