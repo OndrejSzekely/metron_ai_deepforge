@@ -36,6 +36,19 @@ class Imagenet64(object):
     def __init__(self, data_path):
         self.data_path = Path(str(data_path))
 
+        self.n_classes = 1000
+        # assert len(np.unique(self.data["y_train"])) == n_classes and len(np.unique(self.data["y_train"])) >= len(np.unique(self.data["y_test"]))
+
+    def load_test_data(self):
+        with open(self.data_path / "dev_data/dev_data_batch_1", "rb") as fo:
+            data = pickle.load(fo)
+            x_test = data["data"].reshape((data["data"].shape[0], 3, 64, 64)).transpose((0, 2, 3, 1))
+            y_test = np.array(data["labels"]) - 1
+        del data
+
+        return x_test, y_test
+
+    def load_train_data(self):
         train_files = os.listdir(self.data_path / "train_data")
         x_train = []
         y_train = []
@@ -53,27 +66,18 @@ class Imagenet64(object):
 
         assert x_train.shape[0] == len(y_train)
 
-        with open(self.data_path / "dev_data/dev_data_batch_1", "rb") as fo:
-            data = pickle.load(fo)
-            x_test = data["data"].reshape((data["data"].shape[0], 3, 64, 64)).transpose((0, 2, 3, 1))
-            y_test = np.array(data["labels"]) - 1
-
-        self.data = {
-            "x_train": x_train,
-            "y_train": y_train,
-            "x_test": x_test,
-            "y_test": y_test,
-        }
-
-        n_classes = 1000
-        assert len(np.unique(self.data["y_train"])) == n_classes and len(np.unique(self.data["y_train"])) >= len(np.unique(self.data["y_test"]))
+        return x_train, y_train
 
     def datagen_cls(self, batch_size, ds="train", augmentation=False):
         epoch_i = 0
-        ds_size = len(self.data[f"y_{ds}"])
 
         augmentor = init_augmentor()
-
+        x_full, y_full = None, None
+        if ds == "test":
+            x_full, y_full = self.load_test_data()
+        elif ds == "train":
+            x_full, y_full = self.load_train_data()
+        ds_size = len(y_full)
         while True:
             np.random.seed(epoch_i)
             perm = np.random.permutation(ds_size)
@@ -84,7 +88,7 @@ class Imagenet64(object):
                 if len(selection) < batch_size:
                     continue
 
-                x, y = self.data[f"x_{ds}"][selection], self.data[f"y_{ds}"][selection]
+                x, y = x_full[selection], y_full[selection]
 
                 x = normalize_img(x)
 

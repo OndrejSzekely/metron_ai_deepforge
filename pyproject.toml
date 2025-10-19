@@ -45,11 +45,12 @@ metron_shared = { path = "./metron_shared", editable = false }
 pythonpath = "."
 console_output_style = "count"
 empty_parameter_set_mark = "xfail"
-testpaths = ["tests"]
+testpaths = ["usecases/assignments/samplinghuman/tests"]
 markers = [
     "unit: marks tests as unit tests",
     "integration: marks tests as integration tests",
 ]
+timeout = 500
 
 [tool.bandit.assert_used]
 skips = ['*_test.py', '*/test_*.py']

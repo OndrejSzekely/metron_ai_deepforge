@@ -5,4 +5,9 @@
 
 from usecases.assignments.samplinghuman.utils.data import Imagenet64
 
+TRAINING_STEPS: int = 100
+
 og_dataset = Imagenet64("/mnt/samplinghuman_data")
+
+for step in range(TRAINING_STEPS):
+    ...
