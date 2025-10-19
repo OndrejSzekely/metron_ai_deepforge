@@ -4,6 +4,7 @@
 """Dataset Generator from <Imagenet64> dataset generator"""
 
 import numpy as np
+import torch
 
 from usecases.assignments.samplinghuman.utils.data import Imagenet64
 
@@ -49,4 +50,4 @@ class DatasetGen:
         labels = np.tile(
             np.concat([([i] * self.tiles_num) for i in range(self.mixed_images_num)]), [self.batch_size, 1]
         )  # shape [B, mixed_images_num * num_tiles_per_image]
-        return batch, labels
+        return torch.Tensor(batch), torch.Tensor(labels)
