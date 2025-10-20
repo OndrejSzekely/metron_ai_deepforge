@@ -15,9 +15,9 @@ def test_batch_visualization():
     # GIVEN: Parameters for dataset generator and a dataset generator instance
     dataset_path = "/mnt/samplinghuman_data"
     batch_size = 4
-    mixed_images_num = 3
+    mixed_images_num = 10
     tile_size = 16
-    split = "test"
+    split = "train"
     dg = DatasetGen(dataset_path=dataset_path, batch_size=batch_size, tile_size=tile_size, mixed_images_num=mixed_images_num, split=split)
 
     # WHEN: Getting a batch from the dataset generator

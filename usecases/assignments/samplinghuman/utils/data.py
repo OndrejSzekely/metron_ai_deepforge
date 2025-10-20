@@ -37,36 +37,29 @@ class Imagenet64(object):
         self.data_path = Path(str(data_path))
 
         self.n_classes = 1000
-        # assert len(np.unique(self.data["y_train"])) == n_classes and len(np.unique(self.data["y_train"])) >= len(np.unique(self.data["y_test"]))
 
-    def load_test_data(self):
-        with open(self.data_path / "dev_data/dev_data_batch_1", "rb") as fo:
+    def load_data(self, path):
+        with open(path, "rb") as fo:
             data = pickle.load(fo)
-            x_test = data["data"].reshape((data["data"].shape[0], 3, 64, 64)).transpose((0, 2, 3, 1))
-            y_test = np.array(data["labels"]) - 1
-        del data
+            x = data["data"].reshape((data["data"].shape[0], 3, 64, 64)).transpose((0, 2, 3, 1))
+            y = np.array(data["labels"]) - 1
+        return x, y
 
-        return x_test, y_test
-
-    def load_train_data(self):
-        train_files = os.listdir(self.data_path / "train_data")
-        x_train = []
-        y_train = []
+    def get_train_dataset_metadata(self):
+        train_files = list(sorted(map(lambda path: self.data_path / "train_data" / path, os.listdir(self.data_path / "train_data"))))
+        images_num = []
         for train_file in train_files:
-            with open(self.data_path / "train_data" / train_file, "rb") as fo:
-                data = pickle.load(fo)
-                x = data["data"].reshape((data["data"].shape[0], 3, 64, 64)).transpose((0, 2, 3, 1))
-                y = np.array(data["labels"]) - 1
+            x, _ = self.load_data(train_file)
+            images_num.append(len(x))
+        return train_files, images_num
 
-                x_train.append(x)
-                y_train.append(y)
-        del x, y
-        x_train = np.concatenate(x_train, axis=0)
-        y_train = np.concatenate(y_train, axis=0)
-
-        assert x_train.shape[0] == len(y_train)
-
-        return x_train, y_train
+    def get_test_dataset_metadata(self):
+        test_files = [self.data_path / "dev_data/dev_data_batch_1"]
+        images_num = []
+        for test_file in test_files:
+            x, _ = self.load_data(test_file)
+            images_num.append(len(x))
+        return test_files, images_num
 
     def datagen_cls(self, batch_size, ds="train", augmentation=False):
         epoch_i = 0
@@ -74,15 +67,29 @@ class Imagenet64(object):
         augmentor = init_augmentor()
         x_full, y_full = None, None
         if ds == "test":
-            x_full, y_full = self.load_test_data()
+            binary_paths, image_nums = self.get_test_dataset_metadata()
         elif ds == "train":
-            x_full, y_full = self.load_train_data()
-        ds_size = len(y_full)
+            binary_paths, image_nums = self.get_train_dataset_metadata()
         while True:
             np.random.seed(epoch_i)
-            perm = np.random.permutation(ds_size)
+            binaries_perm = np.random.permutation(len(binary_paths))[0 : min(len(binary_paths), 5)]
+            binary_paths = [binary_paths[i] for i in binaries_perm]
+            image_nums = [image_nums[i] for i in binaries_perm]
 
-            for i in range(0, ds_size, batch_size):
+            x_list = []
+            y_list = []
+            for binary_path in binary_paths:
+                x, y = self.load_data(binary_path)
+                x_list.append(x)
+                y_list.append(y)
+            x_full = np.concatenate(x_list, axis=0)
+            y_full = np.concatenate(y_list, axis=0)
+            del x_list, y_list, x, y
+
+            ds_size = sum(image_nums)
+            iterations_num = ds_size // batch_size
+            perm = np.random.permutation(ds_size)
+            for i in range(0, iterations_num, batch_size):
                 selection = perm[i : i + batch_size]
 
                 if len(selection) < batch_size:
