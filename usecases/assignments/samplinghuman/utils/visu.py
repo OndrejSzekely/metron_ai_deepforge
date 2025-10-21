@@ -67,3 +67,29 @@ def visualize_batch(fragment_size: int, batch: torch.Tensor) -> np.ndarray:
             ] = np.transpose(batch[batch_img_idx, :, fragment_idx, :, :], (1, 2, 0)) * 255
 
     return canvas
+
+
+def visualize_image_encoder_decoder(batch: torch.Tensor, inference_res: torch.Tensor) -> np.ndarray:
+    """Visualizes original and reconstructed images side by side."""
+    sample_border = ELEMENT_BORDER_SIZE * 2
+    batch = batch.cpu().numpy()
+    inference_res = inference_res.cpu().numpy()
+    batch_size, channels_num, height, width = batch.shape
+    element_width = 2 * width + ELEMENT_BORDER_SIZE + sample_border
+    element_height = height + sample_border
+    canvas_width = element_width * IMGS_PER_ROW
+    image_rows = int(math.ceil(batch_size / IMGS_PER_ROW))
+    canvas_height = element_height * image_rows
+    canvas = np.zeros((canvas_height, canvas_width, channels_num), dtype=np.uint8)
+
+    for batch_img_idx in range(batch_size):
+        canvas_loc_y = (batch_img_idx // IMGS_PER_ROW) * element_height
+        canvas_loc_x = (batch_img_idx % IMGS_PER_ROW) * element_width
+        canvas[canvas_loc_y : canvas_loc_y + height, canvas_loc_x : canvas_loc_x + width, :] = (
+            np.transpose(batch[batch_img_idx, :, :, :], (1, 2, 0))
+        ) * 255
+        prediction_render_position_x = canvas_loc_x + width + ELEMENT_BORDER_SIZE
+        canvas[canvas_loc_y : canvas_loc_y + height, prediction_render_position_x : prediction_render_position_x + width, :] = (
+            np.transpose(inference_res[batch_img_idx, :, :, :], (1, 2, 0))
+        ) * 255
+    return canvas
