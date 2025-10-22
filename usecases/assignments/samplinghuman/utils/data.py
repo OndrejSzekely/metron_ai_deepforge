@@ -35,7 +35,8 @@ def init_augmentor():
 class Imagenet64(object):
     def __init__(self, data_path):
         self.data_path = Path(str(data_path))
-
+        self.iterations_num = None
+        self.dataset_size = None
         self.n_classes = 1000
 
     def load_data(self, path):
@@ -89,6 +90,8 @@ class Imagenet64(object):
             ds_size = sum(image_nums)
             iterations_num = ds_size // batch_size
             perm = np.random.permutation(ds_size)
+            self.iterations_num = iterations_num
+            self.dataset_size = ds_size
             for i in range(0, iterations_num, batch_size):
                 selection = perm[i : i + batch_size]
 
