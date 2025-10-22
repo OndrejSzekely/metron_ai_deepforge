@@ -5,3 +5,4 @@ external/
 .ruff_cache
 .env
 outputs
+output

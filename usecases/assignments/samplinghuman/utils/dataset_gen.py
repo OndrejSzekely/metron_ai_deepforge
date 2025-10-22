@@ -14,6 +14,8 @@ IMAGE_CHANNELS = 3
 
 class DatasetGen:
     def __init__(self, dataset_path: str, batch_size: int, mixed_images_num: int, split: str, tile_size: int, use_augmentations: bool = False):
+        assert split in ["train", "test"]
+        self.split = split
         self.batch_size = batch_size
         self.mixed_images_num = mixed_images_num
         self.og_dataset_gen = Imagenet64(dataset_path)
@@ -23,6 +25,10 @@ class DatasetGen:
         self.tile_size = tile_size
         assert IMAGE_SIZE % tile_size == 0
         self.tiles_num = (IMAGE_SIZE // self.tile_size) ** 2
+
+    def get_val_data_images_num(self):
+        _, images_num = self.og_dataset_gen.get_test_dataset_metadata()
+        return sum(images_num)
 
     def __iter__(self):
         return self
