@@ -42,7 +42,7 @@ val_iterations_num = val_images_num // BATCH_SIZE
 train_iterations_num = train_images_num // BATCH_SIZE
 logger.info(f"Train dataset size: {train_images_num} images / {train_iterations_num} iterations")
 logger.info(f"Validation dataset size: {val_images_num} images / {val_iterations_num} iterations")
-image_encoder_decoder_model = VAE(embedding_dim=EMBEDDING_DIM, tile_size=TILE_SIZE, device="cuda")
+image_encoder_decoder_model = VAE(embedding_dim=EMBEDDING_DIM, device="cuda")
 optimizer = torch.optim.Adam(image_encoder_decoder_model.parameters(), lr=1e-3)
 warmup_scheduler = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=0.01, total_iters=WARMUP_ITERATIONS)
 cosine_scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=COSINE_SCHEDULER_PERIOD, T_mult=1, eta_min=1e-5)

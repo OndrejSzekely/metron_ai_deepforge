@@ -16,6 +16,7 @@ def initialize_weights(layer: nn.Module):
 
 
 def sinusoidal_positional_encoding(d_model, tile_size):
+    d_model = d_model // 4  # Since we have 2D positional encoding, we reduce the dimension accordingly
     position = np.arange(tile_size * tile_size)[:, np.newaxis]
     div_term = np.exp(np.arange(0, d_model, 2) * -(np.log(10000.0) / d_model))
     row_pos = np.repeat(np.arange(0, tile_size), tile_size)[:, np.newaxis]
@@ -25,4 +26,4 @@ def sinusoidal_positional_encoding(d_model, tile_size):
     pe[:, 0::2] = np.sin(position * div_term) * np.sin((row_pos / tile_size) * 2 * np.pi) * np.cos((col_pos / tile_size) * 2 * np.pi)
     pe[:, 1::2] = np.cos(position * div_term) * np.sin((row_pos / tile_size) * 2 * np.pi) * np.cos((col_pos / tile_size) * 2 * np.pi)
 
-    return torch.tensor(pe, dtype=torch.float32)
+    return torch.tensor(pe, dtype=torch.float32).flatten()

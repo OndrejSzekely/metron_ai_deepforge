@@ -37,9 +37,9 @@ class VAEEncoder(nn.Module):
     - Conv2D 3x3, stride 1, padding 1, out_channels 256 + BN + ReLU => 2x2x256
     - Conv2D 3x3, stride 1, padding 1, out_channels 256 + BN => 2x2x256
     - Residual connection projected to 256 + ReLU => 2x2x256
-    - MaxPool 2x2, stride 2 => 1x1x256
-    - Flatten => 256
-    - Linear 256 -> 256 + ReLU => 256
+    - Pointwise Conv2D stride 1, padding 0, out_channels embedding_dim//4 => 2x2xembedding_dim//4
+    - ReLU
+    - Flatten => embedding_dim
     """
 
     def __init__(self, embedding_dim: int):
@@ -53,9 +53,9 @@ class VAEEncoder(nn.Module):
         self.conv_block6 = conv_block(in_channels=128, out_channels=128, kernel_size=3, stride=1, padding="same")
         self.conv_block7 = conv_block(in_channels=128, out_channels=256, kernel_size=3, stride=1, padding="same")
         self.conv_block8 = conv_block(in_channels=256, out_channels=256, kernel_size=3, stride=1, padding="same")
-        self.fc1 = nn.Linear(256, 256)
         self.point_conv1 = nn.Conv2d(64, 128, kernel_size=1, stride=1, padding=0)
-        self.point_conv2 = nn.Conv2d(128, self.embedding_dim, kernel_size=1, stride=1, padding=0)
+        self.point_conv2 = nn.Conv2d(128, 256, kernel_size=1, stride=1, padding=0)
+        self.point_conv3 = nn.Conv2d(256, self.embedding_dim // 4, kernel_size=1, stride=1, padding=0)
 
     def forward(self, x):
         """_summary_
@@ -83,9 +83,8 @@ class VAEEncoder(nn.Module):
         x = self.conv_block8(x)
         x = F.relu(x + self.point_conv2(residual))
         x = F.relu(x)
-        x = F.max_pool2d(x, kernel_size=2, stride=2)
+        x = self.point_conv3(x)
         x = x.flatten(start_dim=1)
-        x = self.fc1(x)
         x = F.relu(x)
 
         return x
@@ -170,12 +169,12 @@ class VAEDecoder(nn.Module):
 class VAE(nn.Module):
     """Variational Autoencoder combining VAEEncoder and VAEDecoder."""
 
-    def __init__(self, embedding_dim: int, tile_size: int, device: str = "cpu"):
+    def __init__(self, embedding_dim: int, device: str = "cpu"):
         super().__init__()
         self.embedding_dim = embedding_dim
         self.encoder = VAEEncoder(embedding_dim).to(device)
         self.decoder = VAEDecoder(embedding_dim).to(device)
-        self.positional_encoding = sinusoidal_positional_encoding(d_model=self.embedding_dim, tile_size=tile_size).to(device)
+        self.positional_encoding = sinusoidal_positional_encoding(d_model=self.embedding_dim, tile_size=2).to(device)
 
     def forward(self, x):
         """_summary_
