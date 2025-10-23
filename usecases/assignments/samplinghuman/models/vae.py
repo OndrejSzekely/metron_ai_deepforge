@@ -6,6 +6,8 @@
 from torch import nn
 from torch.nn import functional as F
 
+from usecases.assignments.samplinghuman.utils.net_utils import sinusoidal_positional_encoding
+
 
 def conv_block(in_channels, out_channels, kernel_size, stride, padding, use_bn=True):
     """Convolutional Block with optional BatchNorm and ReLU."""
@@ -168,11 +170,12 @@ class VAEDecoder(nn.Module):
 class VAE(nn.Module):
     """Variational Autoencoder combining VAEEncoder and VAEDecoder."""
 
-    def __init__(self, embedding_dim: int):
+    def __init__(self, embedding_dim: int, tile_size: int, device: str = "cpu"):
         super().__init__()
         self.embedding_dim = embedding_dim
-        self.encoder = VAEEncoder(embedding_dim)
-        self.decoder = VAEDecoder(embedding_dim)
+        self.encoder = VAEEncoder(embedding_dim).to(device)
+        self.decoder = VAEDecoder(embedding_dim).to(device)
+        self.positional_encoding = sinusoidal_positional_encoding(d_model=self.embedding_dim, tile_size=tile_size).to(device)
 
     def forward(self, x):
         """_summary_
@@ -180,6 +183,6 @@ class VAE(nn.Module):
         Args:
             x (torch.Tensor): Tensor of shape (B, C, H, W)
         """
-        latent = self.encoder(x)
+        latent = self.encoder(x) + self.positional_encoding
         reconstructed = self.decoder(latent)
         return reconstructed

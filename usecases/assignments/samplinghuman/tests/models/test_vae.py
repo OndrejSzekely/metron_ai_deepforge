@@ -67,9 +67,10 @@ def test_vae_decoder_forward_pass():
 def test_vae_initialization():
     # GIVEN: <embedding_dim> parameter
     embedding_dim = 256
+    tile_size = 16
 
     # WHEN: Initializing the VAE
-    vae = VAE(embedding_dim)
+    vae = VAE(embedding_dim, tile_size)
 
     # THEN: The VAE should be an instance of VAE
     assert isinstance(vae, VAE)
@@ -80,7 +81,8 @@ def test_vae_forward_pass():
     # GIVEN: A VAE and a sample input tensor
     embedding_dim = 256
     batch_size = 2
-    vae = VAE(embedding_dim)
+    tile_size = 16
+    vae = VAE(embedding_dim, tile_size)
     sample_input = torch.randn(batch_size, 3, 16, 16)
 
     # WHEN: Performing a forward pass
