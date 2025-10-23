@@ -73,7 +73,7 @@ class Imagenet64(object):
             binary_paths, image_nums = self.get_train_dataset_metadata()
         while True:
             np.random.seed(epoch_i)
-            binaries_perm = np.random.permutation(len(binary_paths))[0 : min(len(binary_paths), 5)]
+            binaries_perm = np.random.permutation(len(binary_paths))[0 : min(len(binary_paths), 3)]
             binary_paths = [binary_paths[i] for i in binaries_perm]
             image_nums = [image_nums[i] for i in binaries_perm]
 

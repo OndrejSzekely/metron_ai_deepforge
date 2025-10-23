@@ -21,7 +21,7 @@ def create_model_run_output_dir(base_output_dir: str) -> str:
 
     os.makedirs(base_output_dir, exist_ok=True) if not os.path.exists(base_output_dir) else None
     runs_num = len(os.listdir(base_output_dir))
-    run_id = runs_num - 1 if runs_num > 0 else 0
+    run_id = runs_num if runs_num > 0 else 0
     output_dir = os.path.join(base_output_dir, f"run_{run_id}")
     os.makedirs(output_dir, exist_ok=True)
     os.makedirs(os.path.join(output_dir, CHEKPOINTS_DIR_NAME))

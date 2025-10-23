@@ -26,8 +26,8 @@ class DatasetGen:
         assert IMAGE_SIZE % tile_size == 0
         self.tiles_num = (IMAGE_SIZE // self.tile_size) ** 2
 
-    def get_val_data_images_num(self):
-        _, images_num = self.og_dataset_gen.get_test_dataset_metadata()
+    def get_data_images_num(self):
+        _, images_num = self.og_dataset_gen.get_train_dataset_metadata() if self.split == "train" else self.og_dataset_gen.get_test_dataset_metadata()
         return sum(images_num)
 
     def __iter__(self):
