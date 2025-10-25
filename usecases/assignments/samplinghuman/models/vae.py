@@ -162,8 +162,6 @@ class VAEDecoder(nn.Module):
         x = F.relu(self.conv_block4(x))
         x = F.relu(x + self.point_conv3(residual))
         x = self.conv_block5(x)
-        x = F.sigmoid(x)
-
         return x
 
 
