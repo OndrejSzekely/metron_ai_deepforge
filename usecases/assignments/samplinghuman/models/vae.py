@@ -3,6 +3,7 @@
 
 """Image VAE Model"""
 
+import torch
 from torch import nn
 from torch.nn import functional as F
 
@@ -108,7 +109,7 @@ class VAEDecoder(nn.Module):
     Input resolution is 256 embedding vector with added positional encoding
 
     Architecture:
-    - Reshape 256 -> 1x1x256
+    - Reshape 256 -> 2x2x64
     - ConvTranspose2D 3x3, stride 1, padding 1, out_channels 256 + BN + ReLU  => 2x2x256
     - Conv2D 3x3, stride 1, padding 1, out_channels 256 + BN + ReLU => 2x2x256
     - ConvTranspose2D 3x3, stride 2, padding 1, out_channels 256 + BN + ReLU => 4x4x256
@@ -126,7 +127,6 @@ class VAEDecoder(nn.Module):
     def __init__(self, embedding_dim: int):
         super().__init__()
         self.embedding_dim = embedding_dim
-        self.deconv_block1 = deconv_block(in_channels=self.embedding_dim, out_channels=256, kernel_size=2, stride=1, padding=0, output_padding=0)
         self.conv_block1 = conv_block(in_channels=256, out_channels=256, kernel_size=3, stride=1, padding="same")
         self.deconv_block2 = deconv_block(in_channels=256, out_channels=256, kernel_size=3, stride=1, padding=0, output_padding=0)
         self.conv_block2 = conv_block(in_channels=256, out_channels=128, kernel_size=3, stride=1, padding="same")
@@ -138,6 +138,7 @@ class VAEDecoder(nn.Module):
         self.point_conv1 = nn.Conv2d(256, 128, kernel_size=1, stride=1, padding=0)
         self.point_conv2 = nn.Conv2d(128, 64, kernel_size=1, stride=1, padding=0)
         self.point_conv3 = nn.Conv2d(64, 32, kernel_size=1, stride=1, padding=0)
+        self.point_conv4 = nn.Conv2d(self.embedding_dim // 4, self.embedding_dim, kernel_size=1, stride=1, padding=0)
 
     def forward(self, x):
         """_summary_
@@ -145,8 +146,8 @@ class VAEDecoder(nn.Module):
         Args:
             x (torch.Tensor): Tensor of shape (B, 256)
         """
-        x = x.view(-1, 256, 1, 1)
-        x = F.relu(self.deconv_block1(x))
+        x = x.view(-1, 64, 2, 2)
+        x = F.relu(self.point_conv4(x))
         x = F.relu(self.conv_block1(x))
         x = F.relu(self.deconv_block2(x))
         residual = x
@@ -175,6 +176,12 @@ class VAE(nn.Module):
         self.encoder = VAEEncoder(embedding_dim).to(device)
         self.decoder = VAEDecoder(embedding_dim).to(device)
         self.positional_encoding = sinusoidal_positional_encoding(d_model=self.embedding_dim, tile_size=2).to(device)
+        self.mean = nn.Linear(self.embedding_dim, self.embedding_dim).to(device)
+        self.log_var = nn.Linear(self.embedding_dim, self.embedding_dim).to(device)
+        self.mean.apply(lambda layer: nn.init.xavier_uniform_(layer.weight))
+        self.mean.apply(lambda layer: nn.init.zeros_(layer.bias))
+        self.log_var.apply(lambda layer: nn.init.xavier_uniform_(layer.weight))
+        self.log_var.apply(lambda layer: nn.init.constant_(layer.bias, -1.0))
 
     def forward(self, x):
         """_summary_
@@ -182,6 +189,10 @@ class VAE(nn.Module):
         Args:
             x (torch.Tensor): Tensor of shape (B, C, H, W)
         """
-        latent = self.encoder(x) + self.positional_encoding
+        encoded = self.encoder(x)
+        mean = self.mean(encoded)
+        log_var = self.log_var(encoded)
+        latent_vector = mean + torch.exp(log_var / 2) * torch.randn_like(log_var)
+        latent = latent_vector + self.positional_encoding
         reconstructed = self.decoder(latent)
-        return reconstructed
+        return reconstructed, mean, log_var
