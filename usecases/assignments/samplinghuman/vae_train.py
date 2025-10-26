@@ -17,26 +17,26 @@ from usecases.assignments.samplinghuman.utils.visu import visualize_image_encode
 
 TRAINING_STEPS: int = 200001
 BATCH_SIZE: int = 128
-MIXED_IMAGES_NUM: int = 10
-EMBEDDING_DIM: int = 256  # multiplier of 4
+MIXED_IMAGES_NUM: int = 1
+EMBEDDING_DIM: int = 64  # multiplier of 4
 TILE_SIZE: int = 16
-TRAINING_LOGGING_FREQUENCY: int = 300
+TRAINING_LOGGING_FREQUENCY: int = 100
 VALIDATION_FREQUENCY: int = 1000
 OUTPUT_DIR: str = "/workspaces/metron_ai_deepforge/output"
-CHECKPOINT_FREQUENCY: int = 5000
-WITHOUT_KL_ITERS: int = 20000
-COSINE_SCHEDULER_PERIOD: int = 3000
-WARMUP_ITERATIONS: int = 10000
+CHECKPOINT_FREQUENCY: int = 10000
+WITHOUT_KL_ITERS: int = 10000
+COSINE_SCHEDULER_PERIOD: int = 300
+WARMUP_ITERATIONS: int = 2000
 
 # Setup logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 encoder_train_dataset = DatasetGen(
-    "/mnt/samplinghuman_data", batch_size=BATCH_SIZE, mixed_images_num=1, split="train", tile_size=TILE_SIZE, use_augmentations=False
+    "/mnt/samplinghuman_data", batch_size=BATCH_SIZE, mixed_images_num=MIXED_IMAGES_NUM, split="train", tile_size=TILE_SIZE, use_augmentations=False
 )
 encoder_val_dataset = DatasetGen(
-    "/mnt/samplinghuman_data", batch_size=BATCH_SIZE, mixed_images_num=1, split="test", tile_size=TILE_SIZE, use_augmentations=False
+    "/mnt/samplinghuman_data", batch_size=BATCH_SIZE, mixed_images_num=MIXED_IMAGES_NUM, split="test", tile_size=TILE_SIZE, use_augmentations=False
 )
 val_images_num = encoder_val_dataset.get_data_images_num()
 train_images_num = encoder_train_dataset.get_data_images_num()
@@ -45,10 +45,11 @@ train_iterations_num = train_images_num // BATCH_SIZE
 logger.info(f"Train dataset size: {train_images_num} images / {train_iterations_num} iterations")
 logger.info(f"Validation dataset size: {val_images_num} images / {val_iterations_num} iterations")
 image_encoder_decoder_model = VAE(embedding_dim=EMBEDDING_DIM, device="cuda")
-optimizer = torch.optim.Adam(image_encoder_decoder_model.parameters(), lr=1e-5)
-warmup_scheduler = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=0.01, total_iters=WARMUP_ITERATIONS)
+optimizer = torch.optim.Adam(image_encoder_decoder_model.parameters(), lr=1e-4)
+warmup_scheduler = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=0.1, total_iters=WARMUP_ITERATIONS)
 cosine_scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=COSINE_SCHEDULER_PERIOD, T_mult=1, eta_min=1e-5)
 bce_loss = torch.nn.BCEWithLogitsLoss()
+l1_loss = torch.nn.SmoothL1Loss()
 
 output_dir = create_model_run_output_dir(OUTPUT_DIR)
 training_log = open(f"{output_dir}/training_log.txt", "w")
@@ -63,15 +64,17 @@ for step in range(TRAINING_STEPS):
     x_train = torch.squeeze(x_train)
     x_train = torch.transpose(x_train, 2, 1).reshape(BATCH_SIZE * (IMAGE_SIZE // TILE_SIZE) ** 2, IMAGE_CHANNELS, TILE_SIZE, TILE_SIZE).to("cuda")
     x_predicted, x_train_mean, x_train_logvar = image_encoder_decoder_model(x_train)
-    batch_bce_loss = bce_loss(x_predicted, x_train)
+    batch_bce_loss = bce_loss(x_predicted, x_train) * 10
     x_predicted = torch.nn.functional.sigmoid(x_predicted)
     fft_mse_loss = fft_loss(x_predicted, x_train)
-    batch_kl_loss = (
-        KL_normal_loss(x_train_mean, x_train_logvar) * (step / TRAINING_STEPS) ** 4 if step > WITHOUT_KL_ITERS else torch.Tensor([0.0]).to("cuda")
-    )
-    batch_loss = batch_bce_loss + fft_mse_loss + batch_kl_loss
+    batch_loss = batch_bce_loss
+    if step > WITHOUT_KL_ITERS:
+        batch_kl_loss = KL_normal_loss(x_train_mean, x_train_logvar) * (step / (TRAINING_STEPS + WITHOUT_KL_ITERS)) ** 2
+        batch_loss += fft_mse_loss + batch_kl_loss
+    else:
+        batch_kl_loss = torch.zeros((1), requires_grad=False)
     batch_loss.backward()
-    torch.nn.utils.clip_grad_norm_(image_encoder_decoder_model.parameters(), 2.0)
+    # torch.nn.utils.clip_grad_norm_(image_encoder_decoder_model.parameters(), 2.0)
     optimizer.step()
     cosine_scheduler.step() if step > WARMUP_ITERATIONS else warmup_scheduler.step()
     if step % TRAINING_LOGGING_FREQUENCY == 0:
@@ -91,9 +94,13 @@ for step in range(TRAINING_STEPS):
             x_val = torch.squeeze(x_val)
             x_val = torch.transpose(x_val, 2, 1).reshape(BATCH_SIZE * (IMAGE_SIZE // TILE_SIZE) ** 2, IMAGE_CHANNELS, TILE_SIZE, TILE_SIZE).to("cuda")
             x_val_predicted, x_val_mean, x_val_logvar = image_encoder_decoder_model(x_val)
-            val_batch_bce_loss += bce_loss(x_val_predicted, x_val).item()
+            val_batch_bce_loss += bce_loss(x_val_predicted, x_val).item() * 10
             x_val_predicted = torch.nn.functional.sigmoid(x_val_predicted)
-            val_loss_kl += KL_normal_loss(x_val_mean, x_val_logvar).item() * (step / TRAINING_STEPS) ** 4 if step > WITHOUT_KL_ITERS else 0.0
+            val_loss_kl += (
+                KL_normal_loss(x_val_mean, x_val_logvar).item() * (step / (TRAINING_STEPS + WITHOUT_KL_ITERS)) ** 2
+                if step > WITHOUT_KL_ITERS
+                else 0.0
+            )
             val_fft2_mse_loss += fft_loss(x_val_predicted, x_val).item()
         image_encoder_decoder_model.train()
         val_batch_bce_loss /= val_iterations_num

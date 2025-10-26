@@ -5,10 +5,11 @@ import torch
 
 
 def KL_normal_loss(mean, log_var):
-    mean = torch.nan_to_num(mean)
-    log_var = torch.nan_to_num(log_var)
-    loss = -0.5 * torch.sum((1 + log_var - mean**2 - log_var.exp()))
+    # mean = torch.nan_to_num(mean)
+    # log_var = torch.nan_to_num(log_var)
+    loss = -0.5 * torch.sum((1 + log_var - mean**2 - log_var.exp()), 1)
     loss = torch.mean(loss)
+    # loss = torch.clamp(loss, 0, 5)
     return loss
 
 
