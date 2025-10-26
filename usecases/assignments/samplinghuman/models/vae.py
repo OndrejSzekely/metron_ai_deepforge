@@ -7,8 +7,6 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-from usecases.assignments.samplinghuman.utils.net_utils import sinusoidal_positional_encoding
-
 
 def conv_block(in_channels, out_channels, kernel_size, stride, padding, use_bn=True):
     """Convolutional Block with optional BatchNorm and ReLU."""
@@ -168,18 +166,29 @@ class VAEDecoder(nn.Module):
 class VAE(nn.Module):
     """Variational Autoencoder combining VAEEncoder and VAEDecoder."""
 
-    def __init__(self, embedding_dim: int, device: str = "cpu"):
+    def __init__(self, embedding_dim: int, device: str = "cpu", checkpoint_path=None):
         super().__init__()
         self.embedding_dim = embedding_dim
         self.encoder = VAEEncoder(embedding_dim).to(device)
         self.decoder = VAEDecoder(embedding_dim).to(device)
-        self.positional_encoding = sinusoidal_positional_encoding(d_model=self.embedding_dim, tile_size=2).to(device)
         self.mean = nn.Linear(self.embedding_dim, self.embedding_dim).to(device)
         self.log_var = nn.Linear(self.embedding_dim, self.embedding_dim).to(device)
         self.mean.apply(lambda layer: nn.init.xavier_uniform_(layer.weight))
         self.mean.apply(lambda layer: nn.init.zeros_(layer.bias))
         self.log_var.apply(lambda layer: nn.init.xavier_uniform_(layer.weight))
         self.log_var.apply(lambda layer: nn.init.constant_(layer.bias, -1.0))
+        if checkpoint_path is not None:
+            self.load_state_dict(torch.load(checkpoint_path))
+
+    def reparametrize(self, mean, log_var):
+        return mean + torch.exp(log_var / 2.0) * torch.randn_like(log_var)
+
+    def encode(self, x):
+        encoded = self.encoder(x)
+        mean = self.mean(encoded)
+        log_var = self.log_var(encoded)
+        latent = self.reparametrize(mean, log_var)
+        return latent, mean, log_var
 
     def forward(self, x):
         """_summary_
@@ -187,10 +196,6 @@ class VAE(nn.Module):
         Args:
             x (torch.Tensor): Tensor of shape (B, C, H, W)
         """
-        encoded = self.encoder(x)
-        mean = self.mean(encoded)
-        log_var = self.log_var(encoded)
-        latent_vector = mean + torch.exp(log_var / 2.0) * torch.randn_like(log_var)
-        latent = latent_vector  # + self.positional_encoding
+        latent, mean, log_var = self.encode(x)
         reconstructed = self.decoder(latent)
         return reconstructed, mean, log_var

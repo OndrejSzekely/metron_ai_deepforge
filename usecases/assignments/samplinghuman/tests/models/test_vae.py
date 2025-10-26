@@ -87,4 +87,19 @@ def test_vae_forward_pass():
     output = vae(sample_input)
 
     # THEN: The output should have the expected shape
-    assert output.shape == (batch_size, 3, 16, 16)
+    assert len(output) == 3
+    assert output[0].shape == (batch_size, 3, 16, 16)
+    assert output[1].shape == (batch_size, embedding_dim)
+    assert output[2].shape == (batch_size, embedding_dim)
+
+
+@pytest.mark.unit
+def test_vae_load_checkpoint(vae_checkpoint_path):
+    # GIVEN: Invalid checkpoint path
+    embedding_dim = 64
+
+    # WHEN: Model initialization
+    vae = VAE(embedding_dim, checkpoint_path=vae_checkpoint_path)
+
+    # THEN: No error is triggered
+    isinstance(vae, VAE)

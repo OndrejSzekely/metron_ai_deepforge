@@ -46,7 +46,7 @@ def test_image_encoder_decoder_visualization():
     x, _ = next(dg)
     x = torch.squeeze(x)
     x = torch.transpose(x, 2, 1).reshape(batch_size * (IMAGE_SIZE // tile_size) ** 2, IMAGE_CHANNELS, tile_size, tile_size)
-    inference_res = vae(x)
+    inference_res, mean, log_var = vae(x)
 
     # THEN: Visual inspection of encoder-decoder results
     render = visualize_image_encoder_decoder(x, inference_res.detach())

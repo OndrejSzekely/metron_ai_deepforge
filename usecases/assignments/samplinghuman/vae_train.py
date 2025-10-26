@@ -3,6 +3,7 @@
 
 """SAmplingHuman Assignment - VAE training loop"""
 
+import argparse
 import logging
 
 import cv2 as cv
@@ -28,6 +29,10 @@ WITHOUT_KL_ITERS: int = 10000
 COSINE_SCHEDULER_PERIOD: int = 300
 WARMUP_ITERATIONS: int = 2000
 
+parser = argparse.ArgumentParser()
+parser.add_argument("-c", "--checkpoint", required=False, type=str, help="Model checkpoint path")
+args = parser.parse_args()
+
 # Setup logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -44,8 +49,8 @@ val_iterations_num = val_images_num // BATCH_SIZE
 train_iterations_num = train_images_num // BATCH_SIZE
 logger.info(f"Train dataset size: {train_images_num} images / {train_iterations_num} iterations")
 logger.info(f"Validation dataset size: {val_images_num} images / {val_iterations_num} iterations")
-image_encoder_decoder_model = VAE(embedding_dim=EMBEDDING_DIM, device="cuda")
-optimizer = torch.optim.Adam(image_encoder_decoder_model.parameters(), lr=1e-4)
+image_encoder_decoder_model = VAE(embedding_dim=EMBEDDING_DIM, device="cuda", checkpoint_path=args.checkpoint)
+optimizer = torch.optim.Adam(image_encoder_decoder_model.parameters(), lr=1e-3)
 warmup_scheduler = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=0.1, total_iters=WARMUP_ITERATIONS)
 cosine_scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=COSINE_SCHEDULER_PERIOD, T_mult=1, eta_min=1e-5)
 bce_loss = torch.nn.BCEWithLogitsLoss()
@@ -57,7 +62,8 @@ val_log = open(f"{output_dir}/val_log.txt", "w")
 visu_dir = f"{output_dir}/{VISU_DIR_NAME}"
 
 image_encoder_decoder_model.train()
-image_encoder_decoder_model.apply(initialize_weights)
+if args.checkpoint is None:
+    image_encoder_decoder_model.apply(initialize_weights)
 for step in range(TRAINING_STEPS):
     image_encoder_decoder_model.zero_grad()
     x_train, _ = next(encoder_train_dataset)
@@ -74,7 +80,6 @@ for step in range(TRAINING_STEPS):
     else:
         batch_kl_loss = torch.zeros((1), requires_grad=False)
     batch_loss.backward()
-    # torch.nn.utils.clip_grad_norm_(image_encoder_decoder_model.parameters(), 2.0)
     optimizer.step()
     cosine_scheduler.step() if step > WARMUP_ITERATIONS else warmup_scheduler.step()
     if step % TRAINING_LOGGING_FREQUENCY == 0:
