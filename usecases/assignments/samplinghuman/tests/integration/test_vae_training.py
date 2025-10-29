@@ -23,7 +23,7 @@ def test_vae_training_loop():
     x_dummy, _ = next(encoder_train_dataset)
     x_dummy = torch.squeeze(x_dummy)
     x_dummy = torch.transpose(x_dummy, 2, 1).reshape(BATCH_SIZE * (IMAGE_SIZE // TILE_SIZE) ** 2, IMAGE_CHANNELS, TILE_SIZE, TILE_SIZE).to("cuda")
-    image_encoder_decoder_model = VAE(embedding_dim=EMBEDDING_DIM, device="cuda"))
+    image_encoder_decoder_model = VAE(embedding_dim=EMBEDDING_DIM, device="cuda")
     optimizer = torch.optim.Adam(image_encoder_decoder_model.parameters(), lr=1e-4)
     loss = torch.nn.MSELoss()
 

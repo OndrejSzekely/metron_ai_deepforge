@@ -15,15 +15,17 @@ def initialize_weights(layer: nn.Module):
             nn.init.constant_(layer.bias, 0)
 
 
-def sinusoidal_positional_encoding(d_model, tile_size):
-    d_model = d_model // 4  # Since we have 2D positional encoding, we reduce the dimension accordingly
-    position = np.arange(tile_size * tile_size)[:, np.newaxis]
-    div_term = np.exp(np.arange(0, d_model, 2) * -(np.log(10000.0) / d_model))
-    row_pos = np.repeat(np.arange(0, tile_size), tile_size)[:, np.newaxis]
-    col_pos = np.tile(np.arange(0, tile_size), tile_size)[:, np.newaxis]
+def sinusoidal_positional_encoding(d_model, cells_num):
+    """Applied on (batch, fragments_num, embedding_dim) => embedding_dim = 16 features for 2x2 cells"""
+    d_cell = d_model // (cells_num * cells_num)  # Since we have 2D positional encoding, we reduce the dimension accordingly
+    position = np.repeat(np.arange(cells_num * cells_num), d_cell)
+    div_term = np.tile(np.repeat(np.exp(np.arange(0, d_cell, 2) * -(np.log(10000.0) / d_cell)), 2), cells_num * cells_num)
+    row_pos = np.repeat(np.arange(0, cells_num), d_cell * cells_num)
+    col_pos = np.tile(np.repeat(np.arange(0, cells_num), d_cell), cells_num)
 
-    pe = np.zeros((tile_size * tile_size, d_model))
-    pe[:, 0::2] = np.sin(position * div_term) * np.sin((row_pos / tile_size) * 2 * np.pi) * np.cos((col_pos / tile_size) * 2 * np.pi)
-    pe[:, 1::2] = np.cos(position * div_term) * np.sin((row_pos / tile_size) * 2 * np.pi) * np.cos((col_pos / tile_size) * 2 * np.pi)
+    pe = np.zeros((d_model))
+    pe[0::2] = np.sin(position[0::2] * div_term[0::2])
+    pe[1::2] = np.cos(position[1::2] * div_term[1::2])
+    pe = pe * np.sin((row_pos / (cells_num - 1))) * np.cos((col_pos / (cells_num - 1)))
 
-    return torch.tensor(pe, dtype=torch.float32).flatten()
+    return torch.tensor(pe, dtype=torch.float32)  # must return => (64)

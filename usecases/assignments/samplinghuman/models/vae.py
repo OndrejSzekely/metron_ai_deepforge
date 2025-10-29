@@ -199,3 +199,29 @@ class VAE(nn.Module):
         latent, mean, log_var = self.encode(x)
         reconstructed = self.decoder(latent)
         return reconstructed, mean, log_var
+
+
+class AutoEncoder(nn.Module):
+    """AutoEncoder."""
+
+    def __init__(self, embedding_dim: int, device: str = "cpu", checkpoint_path=None):
+        super().__init__()
+        self.embedding_dim = embedding_dim
+        self.encoder = VAEEncoder(embedding_dim).to(device)
+        self.decoder = VAEDecoder(embedding_dim).to(device)
+        if checkpoint_path is not None:
+            self.load_state_dict(torch.load(checkpoint_path))
+
+    def encode(self, x):
+        encoded = self.encoder(x)
+        return encoded
+
+    def forward(self, x):
+        """_summary_
+
+        Args:
+            x (torch.Tensor): Tensor of shape (B, C, H, W)
+        """
+        latent = self.encode(x)
+        reconstructed = self.decoder(latent)
+        return reconstructed

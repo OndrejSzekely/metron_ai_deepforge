@@ -56,4 +56,4 @@ class DatasetGen:
         labels = np.tile(
             np.concat([([i] * self.tiles_num) for i in range(self.mixed_images_num)]), [self.batch_size, 1]
         )  # shape [B, mixed_images_num * num_tiles_per_image]
-        return torch.Tensor(batch), torch.Tensor(labels)
+        return torch.Tensor(batch), torch.Tensor(labels).to(torch.int64)

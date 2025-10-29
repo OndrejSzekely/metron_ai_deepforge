@@ -2,27 +2,15 @@
 # Copyright (c) 2025 Ondrej Szekely (ondra.szekely@gmail.com).
 
 import matplotlib.pyplot as plt
-import numpy as np
 
+from usecases.assignments.samplinghuman.utils.net_utils import sinusoidal_positional_encoding
 
-def sinusoidal_positional_encoding(pixels, d_model, tile_size):
-    position = np.arange(pixels)[:, np.newaxis]
-    div_term = np.exp(np.arange(0, d_model, 2) * -(np.log(10000.0) / d_model))
-    row_pos = np.repeat(np.arange(0, tile_size), tile_size)[:, np.newaxis]
-    col_pos = np.tile(np.arange(0, tile_size), tile_size)[:, np.newaxis]
+cell_num = 2
+cells_total = cell_num * cell_num
+d_model = 64
 
-    pe = np.zeros((max_position, d_model))
-    pe[:, 0::2] = np.sin(position * div_term) * np.sin((row_pos / tile_size) * 2 * np.pi) * np.cos((col_pos / tile_size) * 2 * np.pi)
-    pe[:, 1::2] = np.cos(position * div_term) * np.sin((row_pos / tile_size) * 2 * np.pi) * np.cos((col_pos / tile_size) * 2 * np.pi)
-
-    return pe
-
-
-tile_size = 16
-max_position = tile_size * tile_size
-d_model = 128
-
-pe = sinusoidal_positional_encoding(max_position, d_model, tile_size)
+pe = sinusoidal_positional_encoding(d_model, cell_num)
+pe = pe.view(cells_total, d_model // cells_total).numpy()
 
 plt.figure(figsize=(12, 8))
 plt.imshow(pe, cmap="coolwarm", aspect="auto", vmin=-1, vmax=1)
