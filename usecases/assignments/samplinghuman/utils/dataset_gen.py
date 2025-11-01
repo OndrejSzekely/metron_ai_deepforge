@@ -37,6 +37,7 @@ class DatasetGen:
         og_batch, _ = next(self.dataset_gen)  # batch_size * mixed_images_num
         og_batch = og_batch.numpy()
         og_batch = np.transpose(og_batch, (0, 3, 1, 2))  # to BCHW
+
         list_os_stripes = np.split(
             og_batch, IMAGE_SIZE // self.tile_size, axis=-1
         )  # list of [self.batch_size * self.mixed_images_num, C, H, tile_size] of IMAGE_SIZE // tile_size elements
@@ -55,5 +56,5 @@ class DatasetGen:
 
         labels = np.tile(
             np.concat([([i] * self.tiles_num) for i in range(self.mixed_images_num)]), [self.batch_size, 1]
-        )  # shape [B, mixed_images_num * num_tiles_per_image]
+        )  # shape [B, mixed_images_num ]
         return torch.Tensor(batch), torch.Tensor(labels).to(torch.int64)

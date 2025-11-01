@@ -103,7 +103,7 @@ def visualize_grouping(batch: torch.Tensor, inference_res: torch.Tensor, images:
     sample_border = ELEMENT_BORDER_SIZE * 2
     batch_border = ELEMENT_BORDER_SIZE * 3
     batch = batch.cpu().numpy()
-    inference_res = torch.argmax(nn.functional.softmax(inference_res, dim=-1), dim=-1)
+    inference_res = torch.argmax(nn.functional.softmax(inference_res, dim=-2), dim=-2)
     inference_res = inference_res.cpu().numpy()
     images = images.cpu().numpy()
     batch_size, fragments_num = inference_res.shape

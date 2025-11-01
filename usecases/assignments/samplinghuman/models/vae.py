@@ -224,4 +224,4 @@ class AutoEncoder(nn.Module):
         """
         latent = self.encode(x)
         reconstructed = self.decoder(latent)
-        return reconstructed
+        return reconstructed, latent

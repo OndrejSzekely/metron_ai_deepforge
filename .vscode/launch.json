@@ -13,7 +13,11 @@
             "justMyCode": true,
             "env": {
                 "PYTHONPATH": "${workspaceRoot}:",
-            }
+            },
+            "args": [
+                "--vae-checkpoint",
+                "/workspaces/metron_ai_deepforge/output/with IFFT/checkpoints/vae_40000.pth"
+            ]
         },
         {
             "name": "Gaia / DiffusionDet / Train",

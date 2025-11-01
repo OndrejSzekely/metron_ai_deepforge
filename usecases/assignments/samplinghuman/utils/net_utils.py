@@ -13,6 +13,8 @@ def initialize_weights(layer: nn.Module):
         nn.init.kaiming_normal_(layer.weight, nonlinearity="relu")
         if layer.bias is not None:
             nn.init.constant_(layer.bias, 0)
+    if isinstance(layer, (nn.Linear)):
+        nn.init.xavier_uniform_(layer.weight)
 
 
 def sinusoidal_positional_encoding(d_model, cells_num):
