@@ -20,3 +20,4 @@ Submodules
 .. autosummary::
    metron_ai_deepforge.metron_shared.param_validators
    metron_ai_deepforge.metron_shared.structures
+   metron_ai_deepforge.metron_shared.utils
