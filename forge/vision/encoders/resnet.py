@@ -28,7 +28,10 @@ class ResNet(nn.Module):
             raise ValueError(f"Module `{_module}` has not given ResNet class <{resnet_version.value}>.")
         resnet_class = getattr(models_module, resnet_version.value)
 
-        return resnet_class()
+        try:
+            return resnet_class(init_weights_type)
+        except KeyError as e:
+            raise ValueError(f"Given non-existing ResNet weights name `{init_weights_type}`.") from e
 
     def __init__(self, resnet_version: ResNetType, init_weights_type: Optional[str]) -> None:
         if is_debug_enabled():
