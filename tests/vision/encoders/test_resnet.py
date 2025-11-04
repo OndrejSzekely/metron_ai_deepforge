@@ -15,6 +15,7 @@ test_resnet_types = [item for item in ResNetType]
 test_resnet_init_weights = [None]
 
 
+@pytest.mark.unit
 @pytest.mark.parametrize(
     "resnet_version",
     test_resnet_types,
@@ -29,3 +30,16 @@ def test_initialize_resnet_class(resnet_version: ResNetType, weights_type: Optio
 
     # THEN: Instance is created
     assert param_val.check_type(resnet, ResNet)
+
+
+@pytest.mark.unit
+def test_initialize_resnet_class_with_non_existing_weights():
+    """Testing <ResNet> class constructor with non-existing weights"""
+    # GIVEN: <ResNet> class constructor parameters and non-existing init weights name
+    resnet_version = ResNetType.ResNet18
+    weights_name = "non-existing"
+
+    # WHEN: Constructor is called
+    # THEN: Error is raised
+    with pytest.raises(ValueError):
+        ResNet(resnet_version, weights_name)
