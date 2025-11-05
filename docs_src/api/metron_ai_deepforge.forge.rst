@@ -10,5 +10,6 @@ metron\_ai\_deepforge.forge package
 Subpackages
 -----------
 .. autosummary::
+   metron_ai_deepforge.forge.common
    metron_ai_deepforge.forge.vision
 
