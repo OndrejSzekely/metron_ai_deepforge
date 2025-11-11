@@ -12,4 +12,5 @@ Subpackages
 .. autosummary::
    metron_ai_deepforge.forge.vision.encoders
    metron_ai_deepforge.forge.vision.models
+   metron_ai_deepforge.forge.vision.utils
 
