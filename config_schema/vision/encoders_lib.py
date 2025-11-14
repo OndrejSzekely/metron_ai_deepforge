@@ -5,7 +5,6 @@
 
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Optional
 
 from hydra.core.config_store import ConfigStore
 from omegaconf import MISSING
@@ -31,7 +30,7 @@ class ResNetConfig(VisionEncoderBaseConfig):
     """Configuration for ResNet encoder."""
 
     resnet_version: ResNetType = MISSING
-    init_weights_type: Optional[str] = None
+    init_weights_type: str | None = None
     _target_: str = "forge.vision.encoders.resnet.ResNet"
 
 
