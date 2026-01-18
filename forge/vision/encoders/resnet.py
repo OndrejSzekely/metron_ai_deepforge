@@ -1,5 +1,5 @@
 # This file is part of the Metron AI DeepForge (https://github.com/OndrejSzekely/metron_ai_deepforge).
-# Copyright (c) 2025 Ondrej Szekely (ondra.szekely@gmail.com).
+# Copyright (c) 2025-2026 Ondrej Szekely (ondra.szekely@gmail.com).
 
 """ResNet Encoder for Vision Tasks."""
 
@@ -91,7 +91,11 @@ class ResNet(nn.Module):
         # TODO: Enrich resolution and output stride.
         return layers
 
-    def set_attachment_point(self, layer_name: str | None = None, output_resolution: CHW | None = None, output_stride: int | None = None) -> None: ...
+    def set_attachment_point(self, layer_name: str | None = None, output_resolution: CHW | None = None, output_stride: int | None = None) -> None:
+        if is_debug_enabled():
+            assert param_val.check_type(layer_name, str | None)
+            assert param_val.check_type(output_resolution, CHW | None)
+            assert param_val.check_type(output_stride, int | None)
 
     def forward(self, x: Tensor):
         """N/A
